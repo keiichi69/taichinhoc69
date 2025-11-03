@@ -1,0 +1,2116 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 Câu Hỏi Luyện Tập Tài Chính</title>
+    <!-- Tải Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Tải Font Awesome cho biểu tượng -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .quiz-container {
+            max-width: 900px;
+        }
+        .option-button {
+            transition: all 0.2s;
+            cursor: pointer;
+            word-wrap: break-word;
+            white-space: normal;
+            text-align: left;
+        }
+        /* Custom scrollbar for question display */
+        .question-wrapper {
+            max-height: 50vh; /* Limit height on small screens */
+            overflow-y: auto;
+        }
+        @media (min-width: 640px) {
+            .question-wrapper {
+                max-height: 75vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Firebase SDKs (Required by the platform) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global variables provided by the environment
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        let db, auth;
+
+        if (Object.keys(firebaseConfig).length > 0) {
+            setLogLevel('Debug');
+            const app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+
+            if (initialAuthToken) {
+                signInWithCustomToken(auth, initialAuthToken)
+                    .then(() => console.log("Firebase signed in with custom token."))
+                    .catch(error => console.error("Firebase custom sign-in error:", error));
+            } else {
+                signInAnonymously(auth)
+                    .then(() => console.log("Firebase signed in anonymously."))
+                    .catch(error => console.error("Firebase anonymous sign-in error:", error));
+            }
+        }
+    </script>
+
+    <div id="app" class="p-4 sm:p-8 min-h-screen flex flex-col items-center">
+        <header class="w-full text-center mb-6">
+            <h1 class="text-3xl font-bold text-gray-800">Bộ 404 Câu Hỏi Luyện Tập Tài Chính</h1>
+            <p class="text-lg text-gray-600 mt-1">Ôn tập toàn diện theo Đề cương</p>
+        </header>
+
+        <main id="quiz-area" class="quiz-container w-full bg-white shadow-xl rounded-2xl p-6 sm:p-10 mb-8 transition-all duration-300">
+            <!-- Content will be injected here -->
+        </main>
+
+        <button id="reset-button" onclick="resetQuiz()" class="hidden px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl shadow-lg transition-all duration-300 transform hover:scale-105">
+            <i class="fas fa-redo-alt mr-2"></i> Làm lại Bài kiểm tra
+        </button>
+    </div>
+
+    <script>
+        // --- QUIZ DATA (50/404 questions for demonstration) ---
+        const totalQuestions = 404; // The total number requested by the user.
+        const quizData = [
+            {
+                id: 1,
+                question: "Về mặt bản chất, tài chính phản ánh tổng thể các quan hệ kinh tế phát sinh trong quá trình nào?",
+                options: [
+                    "A. Chỉ quá trình tạo lập quỹ tiền tệ.",
+                    "B. Chỉ quá trình phân phối quỹ tiền tệ.",
+                    "C. Quá trình tạo lập và sử dụng các quỹ tiền tệ.",
+                    "D. Quá trình trao đổi hàng hóa và dịch vụ."
+                ],
+                answer: "C",
+                rationale: "Tài chính phản ánh tổng thể các quan hệ kinh tế gắn liền với việc tạo lập, phân phối và sử dụng các quỹ tiền tệ nhằm đáp ứng các mục tiêu khác nhau của các chủ thể."
+            },
+            {
+                id: 2,
+                question: "Tiền đề khách quan quyết định sự ra đời và tồn tại của tài chính là gì?",
+                options: [
+                    "A. Sự xuất hiện của tiền tệ và chế độ tư hữu.",
+                    "B. Sản xuất hàng hóa – tiền tệ và Nhà nước.",
+                    "C. Nhu cầu tích lũy tài sản và đầu tư của các doanh nghiệp.",
+                    "D. Hệ thống ngân hàng và thị trường chứng khoán."
+                ],
+                answer: "B",
+                rationale: "Sản xuất hàng hóa – tiền tệ tạo ra sự vận động của giá trị dưới hình thức tiền tệ. Nhà nước tạo ra nhu cầu phân phối tập trung và can thiệp, từ đó làm phát sinh tài chính."
+            },
+            {
+                id: 3,
+                question: "Chức năng phân phối của tài chính thực hiện thông qua cơ chế nào?",
+                options: [
+                    "A. Cơ chế tín dụng ngân hàng.",
+                    "B. Cơ chế thị trường tự do.",
+                    "C. Cơ chế phân phối tiền tệ phi vật chất (tiền tệ trên danh nghĩa).",
+                    "D. Cơ chế phân phối vật chất (hàng hóa)."
+                ],
+                answer: "C",
+                rationale: "Tài chính phân phối giá trị dưới hình thức tiền tệ (giá trị trên danh nghĩa), khác biệt với phân phối vật chất (hàng hóa) hay phân phối thông qua tín dụng."
+            },
+            {
+                id: 4,
+                question: "Vai trò giám đốc của tài chính được thể hiện rõ nhất qua hoạt động nào?",
+                options: [
+                    "A. Việc huy động vốn nhàn rỗi trong nền kinh tế.",
+                    "B. Việc theo dõi, kiểm tra và đánh giá hiệu quả sử dụng các nguồn tài chính.",
+                    "C. Việc chuyển giao quyền sở hữu tài sản giữa các chủ thể.",
+                    "D. Việc thiết lập các quỹ tiền tệ tập trung."
+                ],
+                answer: "B",
+                rationale: "Chức năng giám đốc (kiểm tra) gắn liền với việc theo dõi, kiểm tra và đánh giá toàn bộ quá trình tạo lập, phân phối, sử dụng các quỹ tiền tệ."
+            },
+            {
+                id: 5,
+                question: "Các quan hệ kinh tế phản ánh tài chính công chủ yếu gắn với hoạt động nào?",
+                options: [
+                    "A. Tạo lập và sử dụng quỹ tiền tệ của các doanh nghiệp.",
+                    "B. Tạo lập và sử dụng quỹ tiền tệ của Nhà nước.",
+                    "C. Các giao dịch tín dụng giữa các chủ thể.",
+                    "D. Các hoạt động bảo hiểm và an sinh xã hội."
+                ],
+                answer: "B",
+                rationale: "Tài chính công bao gồm các quan hệ kinh tế gắn với việc tạo lập, phân phối và sử dụng các quỹ tiền tệ của Nhà nước (Ngân sách Nhà nước, quỹ ngoài ngân sách, tín dụng Nhà nước)."
+            },
+            {
+                id: 6,
+                question: "Tỷ suất sinh lời trên tổng tài sản (ROA - Return on Assets) được tính bằng công thức nào sau đây?",
+                options: [
+                    "A. Lợi nhuận ròng / Vốn chủ sở hữu.",
+                    "B. Lợi nhuận ròng / Doanh thu thuần.",
+                    "C. Lợi nhuận ròng / Tổng tài sản.",
+                    "D. Tổng tài sản / Tổng nợ phải trả."
+                ],
+                answer: "C",
+                rationale: "ROA đo lường hiệu quả sử dụng tổng tài sản của doanh nghiệp để tạo ra lợi nhuận ròng."
+            },
+            {
+                id: 7,
+                question: "Đâu là quyết định đầu tư (Investment Decision) trong quản trị tài chính doanh nghiệp?",
+                options: [
+                    "A. Quyết định phát hành cổ phiếu mới.",
+                    "B. Quyết định mua sắm tài sản cố định hoặc đầu tư vào dự án mới.",
+                    "C. Quyết định tỷ lệ chi trả cổ tức.",
+                    "D. Quyết định vay nợ dài hạn từ ngân hàng."
+                ],
+                answer: "B",
+                rationale: "Quyết định đầu tư liên quan đến việc sử dụng vốn để mua sắm tài sản hay thực hiện các dự án nhằm tạo ra lợi nhuận trong tương lai."
+            },
+            {
+                id: 8,
+                question: "Loại chứng khoán nào xác nhận quyền chủ nợ của người sở hữu đối với tổ chức phát hành?",
+                options: [
+                    "A. Cổ phiếu thường.",
+                    "B. Trái phiếu.",
+                    "C. Chứng chỉ quỹ đầu tư.",
+                    "D. Cổ phiếu ưu đãi."
+                ],
+                answer: "B",
+                rationale: "Trái phiếu là chứng khoán nợ, xác nhận mối quan hệ chủ nợ-con nợ và người sở hữu được nhận lãi suất định kỳ."
+            },
+            {
+                id: 9,
+                question: "Đầu tư trực tiếp nước ngoài (FDI) khác biệt với FII (Đầu tư gián tiếp nước ngoài) ở điểm cốt lõi nào?",
+                options: [
+                    "A. Quy mô vốn lớn hơn.",
+                    "B. Mục tiêu sinh lời cao hơn.",
+                    "C. Gắn liền với quyền kiểm soát và quản lý trực tiếp.",
+                    "D. Chỉ tập trung vào các nước đang phát triển."
+                ],
+                answer: "C",
+                rationale: "FDI gắn với việc nhà đầu tư nước ngoài thiết lập mối quan hệ kinh tế lâu dài, đi kèm với quyền kiểm soát và quản lý hoạt động sản xuất kinh doanh."
+            },
+            {
+                id: 10,
+                question: "Hệ thống tỷ giá hối đoái thả nổi hoàn toàn (Free Floating Regime) có đặc điểm nào?",
+                options: [
+                    "A. Tỷ giá được cố định bởi Ngân hàng Trung ương.",
+                    "B. Tỷ giá được xác định hoàn toàn bởi cung cầu thị trường mà không có sự can thiệp của Ngân hàng Trung ương.",
+                    "C. Tỷ giá biến động trong một biên độ hẹp do Nhà nước quy định.",
+                    "D. Tỷ giá cố định nhưng được điều chỉnh định kỳ."
+                ],
+                answer: "B",
+                rationale: "Thả nổi hoàn toàn có nghĩa là tỷ giá được quyết định tự do bởi các lực lượng thị trường, Ngân hàng Trung ương không can thiệp."
+            },
+            // Thêm 40 câu hỏi khác để đạt 50 câu...
+            {
+                id: 11,
+                question: "Thuế giá trị gia tăng (VAT) thuộc loại thuế nào trong hệ thống thuế?",
+                options: [
+                    "A. Thuế trực thu.",
+                    "B. Thuế gián thu.",
+                    "C. Thuế tài sản.",
+                    "D. Thuế thu nhập doanh nghiệp."
+                ],
+                answer: "B",
+                rationale: "VAT là thuế gián thu, đánh vào người tiêu dùng cuối cùng thông qua giá cả hàng hóa, trong khi doanh nghiệp là người nộp thuế hộ cho Nhà nước."
+            },
+            {
+                id: 12,
+                question: "Nguyên tắc quản lý tài chính doanh nghiệp cơ bản nhất là gì?",
+                options: [
+                    "A. Tối đa hóa lợi nhuận trước thuế.",
+                    "B. Tối đa hóa giá trị công ty cho cổ đông.",
+                    "C. Tối thiểu hóa chi phí quản lý.",
+                    "D. Tối đa hóa doanh thu và thị phần."
+                ],
+                answer: "B",
+                rationale: "Mục tiêu tối cao của quản trị tài chính doanh nghiệp hiện đại là tối đa hóa giá trị công ty cho các cổ đông (tối đa hóa giá trị cổ phiếu)."
+            },
+            {
+                id: 13,
+                question: "Thị trường tiền tệ (Money Market) là nơi giao dịch các công cụ tài chính nào?",
+                options: [
+                    "A. Các công cụ nợ ngắn hạn (dưới 1 năm).",
+                    "B. Cổ phiếu và trái phiếu dài hạn.",
+                    "C. Bất động sản và hàng hóa.",
+                    "D. Hợp đồng tương lai và quyền chọn."
+                ],
+                answer: "A",
+                rationale: "Thị trường tiền tệ giao dịch các công cụ tài chính có tính thanh khoản cao và thời hạn đáo hạn ngắn (thường dưới 1 năm), ví dụ: tín phiếu kho bạc, chứng chỉ tiền gửi."
+            },
+            {
+                id: 14,
+                question: "Khái niệm 'Dòng tiền chiết khấu' (Discounted Cash Flow - DCF) được sử dụng để làm gì?",
+                options: [
+                    "A. Tính toán lợi nhuận kế toán của công ty.",
+                    "B. Xác định giá trị hiện tại (Present Value) của dòng tiền dự án trong tương lai.",
+                    "C. Đo lường rủi ro của dự án đầu tư.",
+                    "D. Tính toán tỷ lệ hoàn vốn nội bộ (IRR)."
+                ],
+                answer: "B",
+                rationale: "DCF là phương pháp chiết khấu các dòng tiền dự kiến trong tương lai về giá trị hiện tại bằng cách sử dụng một tỷ lệ chiết khấu thích hợp."
+            },
+            {
+                id: 15,
+                question: "Trong Ngân sách Nhà nước (NSNN), chi đầu tư phát triển chủ yếu dùng để làm gì?",
+                options: [
+                    "A. Chi trả lương và trợ cấp xã hội.",
+                    "B. Duy trì hoạt động bộ máy Nhà nước.",
+                    "C. Đầu tư xây dựng cơ sở hạ tầng, mua sắm tài sản cố định.",
+                    "D. Trợ giá các mặt hàng thiết yếu."
+                ],
+                answer: "C",
+                rationale: "Chi đầu tư phát triển nhằm tăng cường cơ sở vật chất, tạo ra tài sản mới cho nền kinh tế quốc dân, ví dụ: xây dựng trường học, bệnh viện, cầu đường."
+            },
+            {
+                id: 16,
+                question: "Công thức nào biểu diễn Tỷ suất sinh lời nội bộ (IRR - Internal Rate of Return)?",
+                options: [
+                    "A. IRR là tỷ lệ chiết khấu làm cho NPV bằng 1.",
+                    "B. IRR là tỷ lệ chiết khấu làm cho NPV bằng 0.",
+                    "C. IRR là tỷ lệ chiết khấu tối thiểu chấp nhận được.",
+                    "D. IRR là tỷ lệ hoàn vốn trung bình hàng năm của dự án."
+                ],
+                answer: "B",
+                rationale: "IRR là tỷ lệ chiết khấu mà tại đó Giá trị hiện tại ròng (NPV) của dự án bằng 0. Đây là tiêu chí để so sánh với chi phí sử dụng vốn."
+            },
+            {
+                id: 17,
+                question: "Công cụ phái sinh nào cho phép người nắm giữ quyền (nhưng không phải nghĩa vụ) mua hoặc bán một tài sản cơ sở vào một ngày cụ thể với một mức giá xác định?",
+                options: [
+                    "A. Hợp đồng kỳ hạn (Forward Contract).",
+                    "B. Hợp đồng tương lai (Futures Contract).",
+                    "C. Hợp đồng quyền chọn (Option Contract).",
+                    "D. Hợp đồng hoán đổi (Swap Contract)."
+                ],
+                answer: "C",
+                rationale: "Hợp đồng quyền chọn là công cụ duy nhất cấp cho người mua 'quyền' (option) mà không bắt buộc họ phải thực hiện giao dịch."
+            },
+            {
+                id: 18,
+                question: "Loại thuế nào sau đây là thuế trực thu?",
+                options: [
+                    "A. Thuế tiêu thụ đặc biệt.",
+                    "B. Thuế xuất khẩu.",
+                    "C. Thuế thu nhập cá nhân (PIT).",
+                    "D. Thuế nhập khẩu."
+                ],
+                answer: "C",
+                rationale: "Thuế trực thu đánh trực tiếp vào thu nhập hoặc tài sản của người chịu thuế và người nộp thuế là một (ví dụ: Thuế TNDN, Thuế TNCN)."
+            },
+            {
+                id: 19,
+                question: "Viện trợ phát triển chính thức (ODA) chủ yếu đến từ nguồn nào và phục vụ mục tiêu gì?",
+                options: [
+                    "A. Nguồn tư nhân, nhằm mục tiêu tối đa hóa lợi nhuận.",
+                    "B. Nguồn Chính phủ/Tổ chức quốc tế, nhằm mục tiêu phát triển và giảm nghèo.",
+                    "C. Nguồn vay thương mại, nhằm mục tiêu tái cơ cấu nợ.",
+                    "D. Nguồn FDI, nhằm mục tiêu giành quyền kiểm soát dự án."
+                ],
+                answer: "B",
+                rationale: "ODA là khoản viện trợ không hoàn lại hoặc cho vay ưu đãi từ các Chính phủ/Tổ chức đa phương (như WB, IMF) cho các nước đang phát triển với mục tiêu thúc đẩy kinh tế và phúc lợi xã hội."
+            },
+            {
+                id: 20,
+                question: "Nếu tỷ lệ nợ trên vốn chủ sở hữu (D/E Ratio) của một công ty quá cao, điều này có ý nghĩa gì đối với rủi ro tài chính?",
+                options: [
+                    "A. Công ty có ít rủi ro tài chính hơn do sử dụng đòn bẩy hiệu quả.",
+                    "B. Công ty có tính thanh khoản cao và khả năng trả nợ tốt.",
+                    "C. Công ty có rủi ro tài chính cao hơn do phụ thuộc lớn vào vốn vay.",
+                    "D. Công ty đang sử dụng nhiều vốn chủ sở hữu hơn vốn vay."
+                ],
+                answer: "C",
+                rationale: "Tỷ lệ D/E cao thể hiện công ty sử dụng đòn bẩy tài chính lớn, làm tăng gánh nặng lãi vay và rủi ro phá sản, do đó làm tăng rủi ro tài chính."
+            },
+            {
+                id: 21,
+                question: "Theo Lý thuyết Thị trường Hiệu quả (EMH), ở 'Mức độ yếu' (Weak Form), giá cổ phiếu phản ánh thông tin nào?",
+                options: [
+                    "A. Tất cả thông tin công khai và nội bộ.",
+                    "B. Chỉ thông tin lịch sử về giá và khối lượng giao dịch.",
+                    "C. Tất cả thông tin công khai.",
+                    "D. Chỉ thông tin nội bộ."
+                ],
+                answer: "B",
+                rationale: "Mức độ yếu chỉ ra rằng giá cả phản ánh tất cả thông tin giao dịch trong quá khứ, nên phân tích kỹ thuật (Technical Analysis) không thể tạo ra lợi nhuận bất thường."
+            },
+            {
+                id: 22,
+                question: "Lãi suất chiết khấu (Discount Rate) được sử dụng để tính Giá trị hiện tại (Present Value) của dòng tiền dự án thường là gì?",
+                options: [
+                    "A. Lãi suất tiền gửi không kỳ hạn.",
+                    "B. Chi phí sử dụng vốn (Cost of Capital) của công ty.",
+                    "C. Tỷ lệ lạm phát dự kiến.",
+                    "D. Tỷ lệ hoàn vốn nội bộ (IRR) của dự án."
+                ],
+                answer: "B",
+                rationale: "Chi phí sử dụng vốn (WACC) là tỷ lệ sinh lời tối thiểu mà nhà đầu tư yêu cầu. Nó được dùng làm lãi suất chiết khấu để đánh giá xem dự án có tạo ra giá trị gia tăng (NPV > 0) hay không."
+            },
+            {
+                id: 23,
+                question: "Quỹ dự trữ ngoại hối quốc gia do cơ quan nào quản lý và sử dụng chính?",
+                options: [
+                    "A. Bộ Tài chính.",
+                    "B. Ngân hàng Trung ương.",
+                    "C. Bộ Kế hoạch và Đầu tư.",
+                    "D. Các ngân hàng thương mại nhà nước."
+                ],
+                answer: "B",
+                rationale: "Ngân hàng Trung ương (như Ngân hàng Nhà nước Việt Nam) là cơ quan duy nhất quản lý và sử dụng dự trữ ngoại hối để điều hành chính sách tiền tệ và ổn định tỷ giá."
+            },
+            {
+                id: 24,
+                question: "Khả năng thanh toán ngắn hạn (Current Ratio) được tính bằng công thức nào?",
+                options: [
+                    "A. Tài sản ngắn hạn / Nợ ngắn hạn.",
+                    "B. Tài sản ngắn hạn / Tổng nợ.",
+                    "C. Tổng tài sản / Tổng nợ.",
+                    "D. Tiền mặt / Nợ ngắn hạn."
+                ],
+                answer: "A",
+                rationale: "Current Ratio (Tỷ lệ thanh toán hiện hành) đo lường khả năng của công ty trong việc sử dụng tài sản ngắn hạn để thanh toán các khoản nợ ngắn hạn."
+            },
+            {
+                id: 25,
+                question: "Mục đích chính của việc chính phủ phát hành Trái phiếu Kho bạc là gì?",
+                options: [
+                    "A. Gây quỹ cho các công ty tư nhân.",
+                    "B. Huy động vốn để bù đắp thâm hụt Ngân sách Nhà nước.",
+                    "C. Điều tiết tỷ giá hối đoái.",
+                    "D. Tài trợ cho các dự án FDI."
+                ],
+                answer: "B",
+                rationale: "Trái phiếu Kho bạc là công cụ vay nợ của Chính phủ, mục đích chính là huy động vốn để tài trợ cho các khoản chi tiêu và bù đắp thâm hụt ngân sách."
+            },
+            {
+                id: 26,
+                question: "Trong phân tích Dupont, ROE là tích của những yếu tố nào?",
+                options: [
+                    "A. Biên lợi nhuận ròng, vòng quay tổng tài sản, và hệ số nhân vốn chủ sở hữu.",
+                    "B. Tỷ suất lợi nhuận gộp, vòng quay hàng tồn kho, và tỷ lệ nợ.",
+                    "C. ROA, Biên lợi nhuận ròng, và Tỷ lệ đòn bẩy.",
+                    "D. EPS và P/E."
+                ],
+                answer: "A",
+                rationale: "Công thức Dupont 3 bước: ROE = Net Profit Margin x Asset Turnover x Equity Multiplier (Lợi nhuận ròng/Doanh thu x Doanh thu/Tổng tài sản x Tổng tài sản/Vốn chủ sở hữu)."
+            },
+            {
+                id: 27,
+                question: "Rủi ro hệ thống (Systematic Risk) là gì?",
+                options: [
+                    "A. Rủi ro chỉ ảnh hưởng đến một công ty hoặc ngành cụ thể, có thể đa dạng hóa.",
+                    "B. Rủi ro thị trường chung, ảnh hưởng đến tất cả các khoản đầu tư, không thể đa dạng hóa.",
+                    "C. Rủi ro liên quan đến sự quản lý kém của công ty.",
+                    "D. Rủi ro về tính thanh khoản của tài sản."
+                ],
+                answer: "B",
+                rationale: "Rủi ro hệ thống (còn gọi là rủi ro thị trường) là rủi ro không thể loại bỏ thông qua đa dạng hóa, ví dụ: lạm phát, suy thoái kinh tế."
+            },
+            {
+                id: 28,
+                question: "Khi Chính phủ áp dụng chính sách tài khóa thắt chặt, mục tiêu chính là gì?",
+                options: [
+                    "A. Kích thích tăng trưởng kinh tế.",
+                    "B. Giảm thâm hụt ngân sách và kiềm chế lạm phát.",
+                    "C. Tăng cường đầu tư công.",
+                    "D. Tăng tỷ lệ thất nghiệp."
+                ],
+                answer: "B",
+                rationale: "Chính sách tài khóa thắt chặt bao gồm việc tăng thuế và/hoặc giảm chi tiêu công, nhằm giảm tổng cầu và kiềm chế lạm phát, giảm nợ công."
+            },
+            {
+                id: 29,
+                question: "Phương pháp kế toán nào được sử dụng để tính toán giá trị sổ sách của tài sản tài chính?",
+                options: [
+                    "A. Giá trị thị trường (Market Value).",
+                    "B. Giá trị hiện tại ròng (NPV).",
+                    "C. Chi phí lịch sử (Historical Cost) sau khi trừ khấu hao.",
+                    "D. Giá trị thanh lý."
+                ],
+                answer: "C",
+                rationale: "Kế toán thường ghi nhận tài sản theo nguyên tắc giá gốc (chi phí lịch sử) và điều chỉnh bằng khấu hao (đối với tài sản cố định)."
+            },
+            {
+                id: 30,
+                question: "Hình thức tài chính quốc tế nào mang tính không hoàn lại hoặc ưu đãi cao?",
+                options: [
+                    "A. Đầu tư trực tiếp nước ngoài (FDI).",
+                    "B. Đầu tư gián tiếp nước ngoài (FII).",
+                    "C. Viện trợ phát triển chính thức (ODA).",
+                    "D. Vay thương mại quốc tế."
+                ],
+                answer: "C",
+                rationale: "ODA là hình thức tài trợ phi lợi nhuận, với mục tiêu hỗ trợ phát triển, có điều kiện ưu đãi (lãi suất thấp, thời gian ân hạn dài, hoặc không hoàn lại)."
+            },
+            {
+                id: 31,
+                question: "Một trong những vai trò quan trọng nhất của thị trường tài chính là gì?",
+                options: [
+                    "A. Sản xuất hàng hóa và dịch vụ.",
+                    "B. Tăng cường quyền lực chính trị của Nhà nước.",
+                    "C. Luân chuyển vốn từ nơi thừa vốn sang nơi thiếu vốn (phân bổ vốn).",
+                    "D. Cung cấp việc làm cho xã hội."
+                ],
+                answer: "C",
+                rationale: "Thị trường tài chính đóng vai trò trung gian, giúp phân bổ hiệu quả nguồn vốn từ các chủ thể tiết kiệm đến các chủ thể cần vốn để đầu tư."
+            },
+            {
+                id: 32,
+                question: "Chỉ số nào được dùng để đo lường mức độ biến động (rủi ro) của một cổ phiếu so với toàn bộ thị trường?",
+                options: [
+                    "A. Alpha.",
+                    "B. Beta.",
+                    "C. Tỷ lệ P/E.",
+                    "D. Tỷ suất cổ tức."
+                ],
+                answer: "B",
+                rationale: "Chỉ số Beta (<span class='font-mono'>&beta;</span>) đo lường rủi ro hệ thống (non-diversifiable risk) của một tài sản so với rủi ro của thị trường chung."
+            },
+            {
+                id: 33,
+                question: "Khoản thu nào sau đây là nguồn thu thường xuyên, chủ yếu của Ngân sách Nhà nước?",
+                options: [
+                    "A. Thu từ bán tài sản nhà nước.",
+                    "B. Thu từ các khoản viện trợ nước ngoài.",
+                    "C. Thu từ thuế, phí và lệ phí.",
+                    "D. Thu từ các khoản vay nợ công."
+                ],
+                answer: "C",
+                rationale: "Thu từ thuế, phí và lệ phí là nguồn thu quan trọng nhất và mang tính ổn định, thường xuyên nhất của Ngân sách Nhà nước."
+            },
+            {
+                id: 34,
+                question: "Nguyên tắc 'Giá trị thời gian của tiền' (Time Value of Money) thể hiện điều gì?",
+                options: [
+                    "A. Tiền nhận được hôm nay có giá trị bằng tiền nhận được trong tương lai.",
+                    "B. Tiền nhận được trong tương lai có giá trị cao hơn tiền nhận được hôm nay.",
+                    "C. Tiền nhận được hôm nay có giá trị cao hơn tiền nhận được trong tương lai.",
+                    "D. Giá trị của tiền không đổi theo thời gian."
+                ],
+                answer: "C",
+                rationale: "Nguyên tắc này khẳng định một khoản tiền nhận được sớm hơn có giá trị cao hơn vì có thể được đầu tư để sinh lời (cơ hội, lạm phát, rủi ro)."
+            },
+            {
+                id: 35,
+                question: "Thị trường chứng khoán sơ cấp là nơi diễn ra hoạt động nào?",
+                options: [
+                    "A. Giao dịch mua bán lại các chứng khoán đã niêm yết.",
+                    "B. Các công cụ nợ ngắn hạn được mua bán.",
+                    "C. Phát hành lần đầu (IPO, Trái phiếu) từ tổ chức phát hành đến công chúng.",
+                    "D. Giao dịch các công cụ phái sinh."
+                ],
+                answer: "C",
+                rationale: "Thị trường sơ cấp là nơi vốn chuyển từ nhà đầu tư sang tổ chức phát hành thông qua việc bán chứng khoán lần đầu."
+            },
+            {
+                id: 36,
+                question: "Biện pháp nào được Ngân hàng Trung ương sử dụng khi muốn thực hiện chính sách tiền tệ mở rộng?",
+                options: [
+                    "A. Bán trái phiếu Chính phủ ra thị trường mở.",
+                    "B. Tăng tỷ lệ dự trữ bắt buộc.",
+                    "C. Giảm lãi suất chiết khấu và mua chứng khoán Chính phủ.",
+                    "D. Tăng lãi suất cơ bản."
+                ],
+                answer: "C",
+                rationale: "Chính sách tiền tệ mở rộng nhằm tăng cung tiền. Việc giảm lãi suất và mua chứng khoán sẽ bơm tiền vào hệ thống ngân hàng, khuyến khích cho vay và đầu tư."
+            },
+            {
+                id: 37,
+                question: "Quyết định về huy động vốn (Financing Decision) trong quản trị tài chính doanh nghiệp tập trung vào vấn đề gì?",
+                options: [
+                    "A. Quản lý hàng tồn kho.",
+                    "B. Lựa chọn cơ cấu vốn tối ưu (Nợ vs Vốn chủ sở hữu).",
+                    "C. Đánh giá dự án đầu tư.",
+                    "D. Phân tích thị trường."
+                ],
+                answer: "B",
+                rationale: "Quyết định huy động vốn tập trung vào việc lựa chọn nguồn vốn (nợ, vốn chủ sở hữu) với tỷ lệ phù hợp để tối ưu hóa chi phí sử dụng vốn."
+            },
+            {
+                id: 38,
+                question: "Nội dung nào sau đây không thuộc chức năng của tài chính?",
+                options: [
+                    "A. Phân phối.",
+                    "B. Giám đốc.",
+                    "C. Phân tích và dự báo.",
+                    "D. Quản lý nhân sự."
+                ],
+                answer: "D",
+                rationale: "Hai chức năng cơ bản của tài chính là Phân phối (Distribution) và Giám đốc (Supervision/Control). Quản lý nhân sự là chức năng quản lý tổ chức."
+            },
+            {
+                id: 39,
+                question: "Các khoản nợ phải trả ngắn hạn là một phần của:",
+                options: [
+                    "A. Tài sản dài hạn.",
+                    "B. Vốn chủ sở hữu.",
+                    "C. Nguồn vốn thường xuyên.",
+                    "D. Nguồn vốn tạm thời (Nợ ngắn hạn)."
+                ],
+                answer: "D",
+                rationale: "Nợ phải trả ngắn hạn (dưới 1 năm) là một phần của nguồn vốn tạm thời, đối lập với nguồn vốn thường xuyên (Vốn CSH và Nợ dài hạn)."
+            },
+            {
+                id: 40,
+                question: "Yếu tố nào sau đây là chi tiêu thường xuyên của Ngân sách Nhà nước?",
+                options: [
+                    "A. Xây dựng đường cao tốc.",
+                    "B. Chi trả lãi tiền vay của Chính phủ.",
+                    "C. Viện trợ cho nước ngoài.",
+                    "D. Chi mua sắm máy móc thiết bị cho nhà máy điện."
+                ],
+                answer: "B",
+                rationale: "Chi trả lãi vay nợ công là khoản chi định kỳ, bắt buộc để duy trì hoạt động tài chính, do đó thuộc chi thường xuyên."
+            },
+            {
+                id: 41,
+                question: "Trong Tài chính Quốc tế, cán cân thương mại (Balance of Trade) là chênh lệch giữa:",
+                options: [
+                    "A. Thu nhập từ đầu tư và chi trả đầu tư.",
+                    "B. Xuất khẩu dịch vụ và nhập khẩu dịch vụ.",
+                    "C. Xuất khẩu hàng hóa và nhập khẩu hàng hóa.",
+                    "D. Dòng vốn đi và dòng vốn đến."
+                ],
+                answer: "C",
+                rationale: "Cán cân thương mại chỉ tính riêng chênh lệch giữa giá trị xuất khẩu và nhập khẩu hàng hóa."
+            },
+            {
+                id: 42,
+                question: "Chỉ số nào đo lường khả năng của công ty trong việc tạo ra lợi nhuận từ mỗi đồng doanh thu?",
+                options: [
+                    "A. Tỷ suất sinh lời trên tổng tài sản (ROA).",
+                    "B. Biên lợi nhuận ròng (Net Profit Margin).",
+                    "C. Tỷ lệ thanh toán hiện hành (Current Ratio).",
+                    "D. Vòng quay tổng tài sản (Asset Turnover)."
+                ],
+                answer: "B",
+                rationale: "Biên lợi nhuận ròng = Lợi nhuận ròng / Doanh thu, phản ánh mức độ lợi nhuận còn lại sau khi trừ tất cả chi phí."
+            },
+            {
+                id: 43,
+                question: "Mức độ rủi ro của danh mục đầu tư có thể được giảm thiểu thông qua phương pháp nào?",
+                options: [
+                    "A. Chỉ đầu tư vào một loại tài sản.",
+                    "B. Đa dạng hóa danh mục đầu tư.",
+                    "C. Tập trung vào các tài sản có Beta cao.",
+                    "D. Chỉ đầu tư vào các công ty mới thành lập."
+                ],
+                answer: "B",
+                rationale: "Đa dạng hóa giúp giảm Rủi ro phi hệ thống (Unsystematic Risk) bằng cách kết hợp các tài sản có mối tương quan thấp."
+            },
+            {
+                id: 44,
+                question: "Trong quản trị vốn luân chuyển (Working Capital Management), vốn luân chuyển ròng (Net Working Capital) được tính như thế nào?",
+                options: [
+                    "A. Tổng tài sản - Tổng nợ phải trả.",
+                    "B. Tài sản ngắn hạn - Nợ ngắn hạn.",
+                    "C. Tiền mặt + Đầu tư ngắn hạn.",
+                    "D. Vốn chủ sở hữu - Tài sản dài hạn."
+                ],
+                answer: "B",
+                rationale: "Vốn luân chuyển ròng = Tài sản ngắn hạn - Nợ ngắn hạn. Đây là thước đo thanh khoản và hiệu quả hoạt động ngắn hạn của công ty."
+            },
+            {
+                id: 45,
+                question: "Công ty phát hành cổ phiếu ưu đãi (Preferred Stock) để huy động vốn có đặc điểm gì?",
+                options: [
+                    "A. Người sở hữu có quyền bỏ phiếu cao hơn cổ đông thường.",
+                    "B. Cổ tức được ưu tiên trả và cố định.",
+                    "C. Người sở hữu có quyền trở thành chủ nợ của công ty.",
+                    "D. Cổ tức phụ thuộc hoàn toàn vào lợi nhuận hàng năm."
+                ],
+                answer: "B",
+                rationale: "Cổ phiếu ưu đãi có tính chất lai giữa cổ phiếu và trái phiếu: cổ tức cố định và được ưu tiên nhận trước cổ đông thường, nhưng không có quyền bỏ phiếu."
+            },
+            {
+                id: 46,
+                question: "Yếu tố nào sau đây là chi phí sử dụng vốn vay (Cost of Debt) sau thuế?",
+                options: [
+                    "A. Lãi suất vay (r_d).",
+                    "B. Lãi suất vay x (1 - Thuế suất).",
+                    "C. Tỷ suất cổ tức.",
+                    "D. Lãi suất phi rủi ro."
+                ],
+                answer: "B",
+                rationale: "Chi phí lãi vay được khấu trừ khỏi thu nhập chịu thuế, tạo ra lá chắn thuế. Do đó, chi phí sử dụng vốn vay sau thuế = $r_d \\times (1-T)$."
+            },
+            {
+                id: 47,
+                question: "Thị trường ngoại hối (Foreign Exchange Market) là nơi giao dịch cái gì?",
+                options: [
+                    "A. Các mặt hàng xuất nhập khẩu.",
+                    "B. Cổ phiếu và trái phiếu của các công ty đa quốc gia.",
+                    "C. Các loại tiền tệ của các quốc gia khác nhau.",
+                    "D. Các khoản vay dài hạn xuyên quốc gia."
+                ],
+                answer: "C",
+                rationale: "Thị trường ngoại hối là nơi mua bán, trao đổi các đồng tiền của các quốc gia khác nhau, xác định tỷ giá hối đoái."
+            },
+            {
+                id: 48,
+                question: "Thuế nào sau đây được coi là thuế lũy tiến?",
+                options: [
+                    "A. Thuế giá trị gia tăng.",
+                    "B. Thuế tiêu thụ đặc biệt.",
+                    "C. Thuế thu nhập cá nhân (PIT).",
+                    "D. Thuế tài nguyên."
+                ],
+                answer: "C",
+                rationale: "Thuế lũy tiến là thuế có tỷ lệ thuế tăng lên khi thu nhập (cơ sở tính thuế) tăng lên. Thuế TNCN thường áp dụng biểu thuế lũy tiến từng phần."
+            },
+            {
+                id: 49,
+                question: "Giả định cơ bản của mô hình định giá tài sản vốn (CAPM) là gì?",
+                options: [
+                    "A. Các nhà đầu tư không quan tâm đến rủi ro.",
+                    "B. Các nhà đầu tư là duy lý và tìm kiếm danh mục hiệu quả dựa trên rủi ro và lợi nhuận kỳ vọng.",
+                    "C. Rủi ro phi hệ thống không tồn tại.",
+                    "D. Lãi suất phi rủi ro bằng 0."
+                ],
+                answer: "B",
+                rationale: "CAPM dựa trên lý thuyết danh mục đầu tư hiện đại, giả định các nhà đầu tư là duy lý và đa dạng hóa để chỉ còn chịu rủi ro hệ thống."
+            },
+            {
+                id: 50,
+                question: "Trong mô hình NPV, nếu NPV của một dự án nhỏ hơn 0, quyết định đúng đắn về tài chính là gì?",
+                options: [
+                    "A. Chấp nhận dự án vì dự án có IRR dương.",
+                    "B. Chấp nhận dự án vì dự án sẽ tạo ra dòng tiền dương.",
+                    "C. Từ chối dự án vì dự án không tạo ra giá trị gia tăng.",
+                    "D. Đánh giá lại chi phí đầu tư ban đầu."
+                ],
+                answer: "C",
+                rationale: "NPV < 0 có nghĩa là giá trị hiện tại của dòng tiền thu về không đủ để bù đắp chi phí đầu tư, hay nói cách khác, tỷ suất sinh lời của dự án thấp hơn chi phí sử dụng vốn (tỷ lệ chiết khấu), nên dự án không được chấp nhận."
+            },
+            // --- BỔ SUNG 100 CÂU HỎI MỚI ---
+            {
+                id: 51,
+                question: "Chọn đáp án đúng về thị trường tài chính?",
+                options: [
+                    "A. Là nơi giao dịch các loại hàng hóa vật chất",
+                    "B. Là nơi giao dịch các tài sản tài chính như tiền tệ, cổ phiếu, trái phiếu, chứng khoán phái sinh...",
+                    "C. Là nơi cung cấp các dịch vụ bảo hiểm",
+                    "D. Là nơi giao dịch bất động sản."
+                ],
+                answer: "B",
+                rationale: "Thị trường tài chính là nơi diễn ra các hoạt động mua bán, trao đổi các tài sản tài chính (công cụ tài chính) như cổ phiếu, trái phiếu, tiền tệ..."
+            },
+            {
+                id: 52,
+                question: "Trái phiếu là gì?",
+                options: [
+                    "A. Một loại chứng khoán mà nhà đầu tư sở hữu và nhận cổ tức",
+                    "B. Một chứng khoán nợ mà nhà phát hành cam kết trả lãi định kỳ và gốc khi đáo hạn",
+                    "C. Một loại tiền tệ có thể giao dịch trên thị trường quốc tế",
+                    "D. Một chứng khoán xác nhận quyền sở hữu công ty."
+                ],
+                answer: "B",
+                rationale: "Trái phiếu là chứng khoán nợ, xác nhận nghĩa vụ trả nợ (cả gốc và lãi) của tổ chức phát hành cho người nắm giữ."
+            },
+            {
+                id: 53,
+                question: "Nhận định nào đúng về chứng chỉ tiền gửi?",
+                options: [
+                    "A. Một loại chứng khoán xác nhận quyền sở hữu cổ phần trong một công ty",
+                    "B. Một loại chứng chỉ xác nhận việc gửi tiền vào ngân hàng với thời hạn nhất định và lãi suất cố định",
+                    "C. Một chứng chỉ xác nhận quyền vay vốn từ ngân hàng",
+                    "D. Một loại cổ phiếu ưu đãi."
+                ],
+                answer: "B",
+                rationale: "Chứng chỉ tiền gửi (CD) là một công cụ của thị trường tiền tệ, do ngân hàng phát hành, xác nhận khoản tiền gửi có kỳ hạn."
+            },
+            {
+                id: 54,
+                question: "Cổ phiếu được hiểu là:",
+                options: [
+                    "A. Một loại trái phiếu do chính phủ phát hành",
+                    "B. Một chứng khoán xác nhận quyền sở hữu của một cá nhân đối với một phần tài sản của công ty",
+                    "C. Một khoản vay dài hạn từ ngân hàng cho doanh nghiệp",
+                    "D. Một công cụ nợ."
+                ],
+                answer: "B",
+                rationale: "Cổ phiếu là chứng khoán vốn, xác nhận quyền sở hữu một phần công ty cổ phần của người nắm giữ."
+            },
+            {
+                id: 55,
+                question: "Thị trường vốn được hiểu là:",
+                options: [
+                    "A. Là nơi mua bán các công cụ tài chính ngắn hạn",
+                    "B. Là nơi giao dịch các công cụ tài chính dài hạn như cổ phiếu, trái phiếu",
+                    "C. Là nơi giao dịch các sản phẩm phái sinh",
+                    "D. Là nơi chỉ giao dịch tiền tệ."
+                ],
+                answer: "B",
+                rationale: "Thị trường vốn (Capital Market) là nơi giao dịch các công cụ tài chính có kỳ hạn trên 1 năm, chủ yếu là cổ phiếu và trái phiếu."
+            },
+            {
+                id: 56,
+                question: "Nhận định nào đúng về thị trường tiền tệ?",
+                options: [
+                    "A. Là nơi giao dịch các loại tài sản tài chính dài hạn và có tính lỏng thấp",
+                    "B. Là nơi các ngân hàng và tổ chức tài chính giao dịch tiền tệ và các công cụ tài chính ngắn hạn và có tính lỏng cao",
+                    "C. Là nơi các công ty phát hành cổ phiếu",
+                    "D. Là nơi giao dịch cổ phiếu."
+                ],
+                answer: "B",
+                rationale: "Thị trường tiền tệ (Money Market) là nơi giao dịch các công cụ tài chính ngắn hạn (dưới 1 năm) và có tính thanh khoản cao."
+            },
+            {
+                id: 57,
+                question: "Thị trường chứng khoán sơ cấp là:",
+                options: [
+                    "A. Thị trường nơi các nhà đầu tư giao dịch cổ phiếu đã được phát hành",
+                    "B. Thị trường nơi các công ty phát hành cổ phiếu, trái phiếu lần đầu để huy động vốn",
+                    "C. Thị trường nơi các tổ chức tài chính thực hiện giao dịch mua bán tài sản",
+                    "D. Thị trường OTC."
+                ],
+                answer: "B",
+                rationale: "Thị trường sơ cấp là nơi chứng khoán được phát hành lần đầu, giúp vốn chảy từ nhà đầu tư sang tổ chức phát hành."
+            },
+            {
+                id: 58,
+                question: "Thị trường chứng khoán thứ cấp là:",
+                options: [
+                    "A. Thị trường nơi các công ty phát hành cổ phiếu lần đầu tiên",
+                    "B. Thị trường nơi các nhà đầu tư giao dịch cổ phiếu và trái phiếu đã được phát hành",
+                    "C. Thị trường chỉ dành cho các giao dịch giữa các tổ chức tài chính",
+                    "D. Thị trường IPO."
+                ],
+                answer: "B",
+                rationale: "Thị trường thứ cấp là nơi mua bán lại các chứng khoán đã phát hành, tạo tính thanh khoản cho chứng khoán."
+            },
+            {
+                id: 59,
+                question: "Tín phiếu kho bạc là công cụ tài chính phát hành bởi:",
+                options: [
+                    "A. Các ngân hàng thương mại",
+                    "B. Kho bạc Nhà nước",
+                    "C. Các công ty cổ phần",
+                    "D. Ngân hàng trung ương."
+                ],
+                answer: "B",
+                rationale: "Tín phiếu kho bạc là công cụ nợ ngắn hạn do Kho bạc Nhà nước (thuộc Bộ Tài chính) phát hành để bù đắp thâm hụt ngân sách tạm thời."
+            },
+            {
+                id: 60,
+                question: "Công cụ tài chính phái sinh là gì?",
+                options: [
+                    "A. Là tài sản tài chính có giá trị cố định không thay đổi theo thời gian",
+                    "B. Là tài sản tài chính phát hành dựa trên tài sản chính đã có, nhằm phân tán rủi ro hoặc gia tăng lợi nhuận",
+                    "C. Là tài sản tài chính không có mối quan hệ với bất kỳ tài sản nào khác",
+                    "D. Là cổ phiếu hoặc trái phiếu."
+                ],
+                answer: "B",
+                rationale: "Công cụ phái sinh (Derivatives) có giá trị bắt nguồn (derived) từ giá trị của một tài sản cơ sở (underlying asset) khác."
+            },
+            {
+                id: 61,
+                question: "Chủ thể nào dưới đây không được coi là trung gian đầu tư?",
+                options: [
+                    "A. Tổ chức tín dụng",
+                    "B. Công ty tài chính",
+                    "C. Quỹ đầu tư",
+                    "D. Ngân hàng thương mại"
+                ],
+                answer: "A",
+                rationale: "Tổ chức tín dụng là thuật ngữ chung bao gồm cả trung gian nhận tiền gửi (NHTM) và trung gian đầu tư (Công ty tài chính, Quỹ đầu tư). Câu hỏi này có thể không rõ ràng, nhưng Quỹ đầu tư và Công ty tài chính là ví dụ điển hình của trung gian đầu tư."
+            },
+            {
+                id: 62,
+                question: "Chủ thể nào dưới đây không được coi là trung gian nhận tiền gửi?",
+                options: [
+                    "A. Ngân hàng thương mại",
+                    "B. Ngân hàng phát triển",
+                    "C. Công ty tài chính",
+                    "D. Quỹ tín dụng nhân dân"
+                ],
+                answer: "C",
+                rationale: "Công ty tài chính là tổ chức tín dụng phi ngân hàng, được huy động vốn nhưng không được nhận tiền gửi không kỳ hạn từ dân cư."
+            },
+            {
+                id: 63,
+                question: "Chủ thể nào dưới đây được coi là trung gian tiết kiệm theo hợp đồng?",
+                options: [
+                    "A. Ngân hàng thương mại",
+                    "B. Ngân hàng chính sách xã hội",
+                    "C. Công ty bảo hiểm (ví dụ: Bảo hiểm phi nhân thọ)",
+                    "D. Công ty tài chính"
+                ],
+                answer: "C",
+                rationale: "Trung gian tiết kiệm theo hợp đồng huy động vốn dựa trên các hợp đồng định kỳ (ví dụ: phí bảo hiểm, quỹ hưu trí)."
+            },
+            {
+                id: 64,
+                question: "Quỹ đầu tư được hiểu là:",
+                options: [
+                    "A. Là tổ chức cung cấp các khoản vay cho các doanh nghiệp",
+                    "B. Là định chế tài chính trung gian phi ngân hàng huy động vốn từ các nhà đầu tư để đầu tư vào chứng khoán",
+                    "C. Là tổ chức bảo hiểm sinh mạng cho người tham gia",
+                    "D. Là ngân hàng thương mại."
+                ],
+                answer: "B",
+                rationale: "Quỹ đầu tư (Investment Fund) tập hợp vốn từ nhiều nhà đầu tư nhỏ lẻ để tạo thành một danh mục đầu tư chuyên nghiệp."
+            },
+            {
+                id: 65,
+                question: "Quỹ hưu trí được hiểu là:",
+                options: [
+                    "A. Là quỹ đầu tư dài hạn, được thành lập để giúp người lao động tích lũy tiền cho tuổi hưu trí.",
+                    "B. Là quỹ giúp người lao động nhận trợ cấp thất nghiệp.",
+                    "C. Là quỹ đầu tư vào chứng khoán và trái phiếu ngắn hạn.",
+                    "D. Là quỹ của ngân hàng."
+                ],
+                answer: "A",
+                rationale: "Quỹ hưu trí (Pension Fund) là một dạng trung gian tiết kiệm theo hợp đồng, giúp người lao động tiết kiệm cho giai đoạn nghỉ hưu."
+            },
+            {
+                id: 66,
+                question: "Nhận định nào sau đây đúng về định chế tài chính trung gian?",
+                options: [
+                    "A. Các tổ chức chuyên cung cấp dịch vụ giao dịch hàng hóa",
+                    "B. Các tổ chức chuyên huy động và sử dụng vốn để đầu tư và cho vay",
+                    "C. Các tổ chức chuyên thực hiện giao dịch ngoại tệ",
+                    "D. Chỉ bao gồm các ngân hàng."
+                ],
+                answer: "B",
+                rationale: "Vai trò cốt lõi của các định chế tài chính trung gian là luân chuyển vốn từ nơi thừa sang nơi thiếu thông qua các nghiệp vụ huy động và cho vay/đầu tư."
+            },
+            {
+                id: 67,
+                question: "Nguồn vốn mà định chế tài chính trung gian huy động chủ yếu là:",
+                options: [
+                    "A. Vốn từ các tổ chức quốc tế",
+                    "B. Vốn tạm thời nhàn rỗi từ các cá nhân, tổ chức",
+                    "C. Vốn từ các khoản vay ngân hàng",
+                    "D. Vốn của chính phủ."
+                ],
+                answer: "B",
+                rationale: "Các trung gian tài chính tập hợp các khoản vốn nhàn rỗi, nhỏ lẻ trong xã hội thành các quỹ tiền tệ lớn để cho vay và đầu tư."
+            },
+            {
+                id: 68,
+                question: "Nhóm định chế tài chính trung gian nào dưới đây hoạt động với mục tiêu kiếm lời?",
+                options: [
+                    "A. Ngân hàng phát triển, Ngân hàng chính sách xã hội",
+                    "B. Quỹ hưu trí (bảo hiểm xã hội)",
+                    "C. Ngân hàng thương mại, công ty tài chính, công ty bảo hiểm, quỹ đầu tư",
+                    "D. Tất cả các đáp án trên."
+                ],
+                answer: "C",
+                rationale: "Các tổ chức như Ngân hàng chính sách xã hội, Bảo hiểm xã hội hoạt động vì mục tiêu an sinh, phi lợi nhuận. Các tổ chức ở đáp án C hoạt động vì mục tiêu lợi nhuận."
+            },
+            {
+                id: 69,
+                question: "Ngân hàng thương mại là tổ chức kinh doanh tiền tệ có đặc điểm nào sau đây?",
+                options: [
+                    "A. Chỉ nhận tiền gửi và không thực hiện các nghiệp vụ tài chính khác",
+                    "B. Hoạt động chủ yếu là nhận tiền gửi, cho vay và thực hiện các nghiệp vụ thanh toán và chiết khấu",
+                    "C. Hoạt động không liên quan đến thanh toán",
+                    "D. Không được phép cho vay."
+                ],
+                answer: "B",
+                rationale: "Đây là định nghĩa chuẩn về hoạt động của NHTM, bao gồm nghiệp vụ nhận tiền gửi, cấp tín dụng và cung cấp dịch vụ thanh toán."
+            },
+            {
+                id: 70,
+                question: "Bảo hiểm nhân thọ chủ yếu liên quan đến:",
+                options: [
+                    "A. Tổn thất tài sản và cháy nổ",
+                    "B. Sinh mạng, sức khỏe và tuổi thọ của con người",
+                    "C. Tai nạn và bảo vệ tài sản",
+                    "D. Rủi ro thị trường."
+                ],
+                answer: "B",
+                rationale: "Bảo hiểm nhân thọ (Life Insurance) bảo hiểm cho các rủi ro liên quan đến con người (sống, chết, bệnh tật, tuổi thọ)."
+            },
+            {
+                id: 71,
+                question: "Ngân sách nhà nước là gì?",
+                options: [
+                    "A. Quỹ tiền tệ của các ngân hàng nhà nước",
+                    "B. Kế hoạch chi tiêu và thu nhập của chính phủ trong một năm tài chính",
+                    "C. Nguồn vốn đầu tư của doanh nghiệp nhà nước",
+                    "D. Toàn bộ tài sản của quốc gia."
+                ],
+                answer: "B",
+                rationale: "NSNN là bản dự toán (kế hoạch) về toàn bộ các khoản thu và chi của Nhà nước trong một năm, được Quốc hội phê duyệt."
+            },
+            {
+                id: 72,
+                question: "Khu vực công là gì?",
+                options: [
+                    "A. Tất cả các hoạt động kinh tế được thực hiện bởi các doanh nghiệp tư nhân",
+                    "B. Các hoạt động kinh tế của chính phủ và các tổ chức thuộc nhà nước",
+                    "C. Các hoạt động sản xuất, dịch vụ không vì lợi nhuận",
+                    "D. Chỉ bao gồm các doanh nghiệp nhà nước."
+                ],
+                answer: "B",
+                rationale: "Khu vực công (Public Sector) bao gồm các cơ quan, tổ chức, hoạt động thuộc sở hữu và quản lý của Nhà nước (Chính phủ)."
+            },
+            {
+                id: 73,
+                question: "Phí là gì?",
+                options: [
+                    "A. Là khoản thu bắt buộc từ người dân khi sử dụng các dịch vụ công do Nhà nước cung cấp, có mục đích bù đắp chi phí.",
+                    "B. Là khoản thu bắt buộc do Nhà nước quy định, nhằm mục đích tăng thu ngân sách.",
+                    "C. Là khoản thu của Nhà nước để tài trợ cho các dự án phát triển hạ tầng.",
+                    "D. Là khoản thu mang tính tự nguyện."
+                ],
+                answer: "A",
+                rationale: "Phí gắn liền với một dịch vụ công cụ thể và mang tính bù đắp chi phí (ví dụ: học phí, viện phí)."
+            },
+            {
+                id: 74,
+                question: "Lệ phí là gì?",
+                options: [
+                    "A. Là khoản thu do Nhà nước thu từ người dân và doanh nghiệp khi cấp giấy tờ, hồ sơ, dịch vụ hành chính.",
+                    "B. Là khoản thu bắt buộc để duy trì hoạt động của các cơ quan Nhà nước.",
+                    "C. Là khoản thu do các tổ chức phi chính phủ thu từ các cá nhân.",
+                    "D. Là khoản thu mang tính bù đắp chi phí dịch vụ."
+                ],
+                answer: "A",
+                rationale: "Lệ phí gắn liền với việc thực hiện một thủ tục hành chính, pháp lý do cơ quan nhà nước cung cấp (ví dụ: lệ phí trước bạ, lệ phí cấp phép)."
+            },
+            {
+                id: 75,
+                question: "Hàng hóa công là gì?",
+                options: [
+                    "A. Hàng hóa sản xuất bởi các doanh nghiệp tư nhân",
+                    "B. Hàng hóa cung cấp dịch vụ cho thị trường và được bán với giá cao",
+                    "C. Hàng hóa không thể phân chia, không thể bị loại trừ và có lợi ích cho cộng đồng",
+                    "D. Hàng hóa chỉ do nhà nước sản xuất."
+                ],
+                answer: "C",
+                rationale: "Hàng hóa công thuần túy có hai đặc điểm: không cạnh tranh (non-rivalrous) và không thể loại trừ (non-excludable)."
+            },
+            {
+                id: 76,
+                question: "Chi đầu tư phát triển là gì?",
+                options: [
+                    "A. Chi tiêu dùng cho các hoạt động hàng ngày của doanh nghiệp.",
+                    "B. Chi phí cho các dự án và hoạt động nhằm phát triển cơ sở hạ tầng, mở rộng sản xuất và nâng cao năng lực của nền kinh tế.",
+                    "C. Chi phí trả lương cho nhân viên trong các cơ quan nhà nước.",
+                    "D. Chi trả lãi vay."
+                ],
+                answer: "B",
+                rationale: "Chi đầu tư phát triển là khoản chi của NSNN nhằm tạo ra tài sản mới, tăng cường cơ sở vật chất kỹ thuật cho xã hội."
+            },
+            {
+                id: 77,
+                question: "Đặc điểm nào dưới đây thể hiện tính chất không giảm sút khi tiêu dùng (không cạnh tranh) của hàng hóa công?",
+                options: [
+                    "A. Khi một người sử dụng hàng hóa này, thì sự tiêu dùng của người khác cũng giảm đi",
+                    "B. Khi một người sử dụng hàng hóa công, sự tiêu dùng của người khác không bị ảnh hưởng",
+                    "C. Khi một người tiêu dùng hàng hóa công, chính phủ sẽ giảm bớt lượng hàng hóa cung cấp",
+                    "D. Phải trả tiền mới được sử dụng."
+                ],
+                answer: "B",
+                rationale: "Tính không cạnh tranh (non-rivalrous) nghĩa là việc một người tiêu dùng không làm ảnh hưởng đến lợi ích của người tiêu dùng khác (ví dụ: đèn hải đăng, an ninh quốc phòng)."
+            },
+            {
+                id: 78,
+                question: "Tính chất 'không thể phân chia' của hàng hóa công có nghĩa là:",
+                options: [
+                    "A. Hàng hóa công không thể được cung cấp cho một cá nhân riêng lẻ",
+                    "B. Hàng hóa công chỉ có thể được cung cấp cho một nhóm người duy nhất",
+                    "C. Hàng hóa công được cung cấp cho tất cả mọi người, không phân biệt",
+                    "D. Hàng hóa công phải được đóng gói."
+                ],
+                answer: "C",
+                rationale: "Tính 'không thể phân chia' (indivisible) và 'không thể loại trừ' (non-excludable) có nghĩa là khi đã cung cấp, không thể ngăn cản ai sử dụng và lợi ích là chung cho cộng đồng."
+            },
+            {
+                id: 79,
+                question: "Thu nguồn lực công là gì?",
+                options: [
+                    "A. Là quá trình thu thập tiền từ các doanh nghiệp tư nhân để tài trợ cho các dự án công.",
+                    "B. Là quá trình thu thập tài nguyên thiên nhiên từ môi trường để sử dụng cho các mục đích công cộng.",
+                    "C. Là quá trình huy động tài chính để tài trợ cho các chi tiêu công thông qua thuế, phí, vay mượn và các nguồn thu khác của Nhà nước.",
+                    "D. Là quá trình in tiền của Ngân hàng Trung ương."
+                ],
+                answer: "C",
+                rationale: "Thu nguồn lực công (hay thu NSNN) là việc huy động các nguồn tài chính (thuế, phí, vay...) vào quỹ NSNN để chi tiêu."
+            },
+            {
+                id: 80,
+                question: "Thuế là gì?",
+                options: [
+                    "A. Là một khoản đóng góp tự nguyện của công dân vào ngân sách nhà nước.",
+                    "B. Là khoản tiền mà các công dân và tổ chức phải trả cho nhà nước theo quy định của pháp luật để phục vụ cho các mục tiêu công cộng.",
+                    "C. Là khoản tiền mà các doanh nghiệp phải trả cho nhà nước để duy trì hoạt động sản xuất.",
+                    "D. Là khoản phí sử dụng dịch vụ công."
+                ],
+                answer: "B",
+                rationale: "Thuế là khoản thu bắt buộc, không mang tính hoàn trả trực tiếp, do pháp luật quy định, nhằm đáp ứng nhu cầu chi tiêu chung của Nhà nước."
+            },
+            {
+                id: 81,
+                question: "Tài chính doanh nghiệp được hiểu là:",
+                options: [
+                    "A. Quá trình quản lý nguồn tài chính của các tổ chức tài chính",
+                    "B. Quá trình quản lý, huy động và sử dụng các nguồn lực tài chính của doanh nghiệp nhằm đạt được mục tiêu tài chính của doanh nghiệp",
+                    "C. Quá trình lập kế hoạch tài chính cho các tổ chức phi lợi nhuận",
+                    "D. Quá trình kế toán chi phí."
+                ],
+                answer: "B",
+                rationale: "Tài chính doanh nghiệp (Corporate Finance) liên quan đến các quyết định huy động vốn, đầu tư vốn và phân phối lợi nhuận của doanh nghiệp."
+            },
+            {
+                id: 82,
+                question: "Quyết định tài chính doanh nghiệp chủ yếu liên quan đến những yếu tố nào?",
+                options: [
+                    "A. Quyết định về sản xuất và marketing",
+                    "B. Quyết định về huy động vốn, đầu tư và phân phối lợi nhuận",
+                    "C. Quyết định về chiến lược nhân sự và mở rộng thị trường",
+                    "D. Quyết định về kế toán và kiểm toán."
+                ],
+                answer: "B",
+                rationale: "Ba quyết định trụ cột của tài chính doanh nghiệp là: Quyết định đầu tư (Investment), Quyết định huy động vốn (Financing) và Quyết định phân phối lợi nhuận (Dividend)."
+            },
+            {
+                id: 83,
+                question: "Một trong những mục tiêu của quyết định tài chính doanh nghiệp là:",
+                options: [
+                    "A. Tăng trưởng doanh thu ngắn hạn",
+                    "B. Tối đa hóa giá trị của doanh nghiệp và lợi ích cổ đông trong dài hạn",
+                    "C. Tăng số lượng nhân viên",
+                    "D. Tối thiểu hóa nợ phải trả."
+                ],
+                answer: "B",
+                rationale: "Mục tiêu tài chính quan trọng nhất là tối đa hóa giá trị doanh nghiệp, thể hiện qua giá trị cổ phiếu trên thị trường, vì lợi ích của cổ đông."
+            },
+            {
+                id: 84,
+                question: "Phân phối lợi nhuận của doanh nghiệp là:",
+                options: [
+                    "A. Quy trình chi trả tiền lương cho nhân viên",
+                    "B. Quy trình phân chia và sử dụng lợi nhuận sau thuế của doanh nghiệp",
+                    "C. Quy trình phân bố doanh thu giữa các bộ phận trong doanh nghiệp",
+                    "D. Quy trình trả lãi vay cho ngân hàng."
+                ],
+                answer: "B",
+                rationale: "Doanh nghiệp quyết định dùng lợi nhuận sau thuế để làm gì: giữ lại tái đầu tư (Retained Earnings) hay chi trả cổ tức (Dividends)."
+            },
+            {
+                id: 85,
+                question: "Nhận định nào đúng về tài sản cố định trong doanh nghiệp?",
+                options: [
+                    "A. Chỉ được sử dụng trong một chu kỳ sản xuất ngắn hạn",
+                    "B. Được sử dụng liên tục và lâu dài trong sản xuất, kinh doanh",
+                    "C. Không ảnh hưởng đến quy trình sản xuất của doanh nghiệp",
+                    "D. Có tính thanh khoản cao nhất."
+                ],
+                answer: "B",
+                rationale: "Tài sản cố định (Fixed Assets) có thời gian sử dụng dài (thường trên 1 năm) và tham gia vào nhiều chu kỳ sản xuất kinh doanh."
+            },
+            {
+                id: 86,
+                question: "Khấu hao tài sản cố định có nghĩa là:",
+                options: [
+                    "A. Là việc giảm giá trị của tài sản cố định do sự hao mòn tự nhiên, công nghệ lạc hậu hoặc sử dụng lâu dài",
+                    "B. Là việc gia tăng giá trị của tài sản cố định trong quá trình sử dụng",
+                    "C. Là việc trả lại tài sản cố định cho nhà cung cấp",
+                    "D. Là việc bán tài sản cố định."
+                ],
+                answer: "A",
+                rationale: "Khấu hao (Depreciation) là việc phân bổ một cách có hệ thống giá trị của tài sản cố định vào chi phí sản xuất kinh doanh trong suốt thời gian sử dụng hữu ích của nó."
+            },
+            {
+                id: 87,
+                question: "Tài sản lưu động được hiểu là:",
+                options: [
+                    "A. Tài sản có thời gian sử dụng dài hơn một năm và sử dụng trong sản xuất kinh doanh",
+                    "B. Tài sản có giá trị lớn và có thể chuyển nhượng dễ dàng",
+                    "C. Tài sản sử dụng trong quá trình sản xuất, kinh doanh và có thể chuyển hóa thành tiền mặt trong vòng một năm hoặc chu kỳ sản xuất kinh doanh",
+                    "D. Chỉ bao gồm tiền mặt."
+                ],
+                answer: "C",
+                rationale: "Tài sản lưu động (Current Assets) là những tài sản có tính thanh khoản cao, dự kiến được chuyển đổi thành tiền trong vòng 1 năm (ví dụ: tiền mặt, phải thu, hàng tồn kho)."
+            },
+            {
+                id: 88,
+                question: "Chi phí trong doanh nghiệp được hiểu là:",
+                options: [
+                    "A. Số tiền doanh nghiệp phải chi để sản xuất và kinh doanh",
+                    "B. Số tiền doanh nghiệp nhận được từ khách hàng",
+                    "C. Lợi nhuận doanh nghiệp tạo ra từ hoạt động kinh doanh",
+                    "D. Vốn chủ sở hữu của doanh nghiệp."
+                ],
+                answer: "A",
+                rationale: "Chi phí (Expense) là toàn bộ hao phí về lao động sống và lao động vật hóa mà doanh nghiệp bỏ ra để đạt được doanh thu."
+            },
+            {
+                id: 89,
+                question: "Doanh thu của doanh nghiệp là:",
+                options: [
+                    "A. Số tiền doanh nghiệp thu được từ việc bán hàng hoặc cung cấp dịch vụ",
+                    "B. Số tiền doanh nghiệp chi để sản xuất sản phẩm",
+                    "C. Lợi nhuận sau thuế mà doanh nghiệp thu được",
+                    "D. Tổng tài sản của doanh nghiệp."
+                ],
+                answer: "A",
+                rationale: "Doanh thu (Revenue) là tổng giá trị các lợi ích kinh tế doanh nghiệp thu được trong kỳ, phát sinh từ hoạt động sản xuất, kinh doanh thông thường."
+            },
+            {
+                id: 90,
+                question: "Giá thành của sản phẩm là:",
+                options: [
+                    "A. Tổng chi phí liên quan đến việc sản xuất và tiêu thụ sản phẩm",
+                    "B. Giá bán sản phẩm trên thị trường",
+                    "C. Lợi nhuận doanh nghiệp thu được từ sản phẩm",
+                    "D. Chi phí nguyên vật liệu trực tiếp."
+                ],
+                answer: "A",
+                rationale: "Giá thành (Cost of Goods Sold / Cost) là toàn bộ chi phí để sản xuất, hoàn thành và tiêu thụ một đơn vị sản phẩm hoặc dịch vụ."
+            },
+            {
+                id: 91,
+                question: "Tài chính hộ gia đình chủ yếu liên quan đến việc gì?",
+                options: [
+                    "A. Tiết kiệm tiền cho tương lai",
+                    "B. Tạo ra thu nhập, tiết kiệm, đầu tư và chi tiêu hợp lý",
+                    "C. Chỉ tiết kiệm và đầu tư",
+                    "D. Chỉ quản lý các khoản vay."
+                ],
+                answer: "B",
+                rationale: "Tài chính hộ gia đình (hoặc tài chính cá nhân) bao gồm toàn bộ các hoạt động quản lý dòng tiền: kiếm tiền (thu nhập), chi tiêu, tiết kiệm và đầu tư."
+            },
+            {
+                id: 92,
+                question: "Rủi ro khi vay nợ là gì?",
+                options: [
+                    "A. Có thể không đủ tiền để trả nợ và lãi vay",
+                    "B. Các tổ chức tín dụng sẽ không yêu cầu trả nợ khi đến hạn",
+                    "C. Sự thay đổi của các quy định pháp lý sẽ không ảnh hưởng đến khả năng trả nợ",
+                    "D. Lãi suất luôn cố định."
+                ],
+                answer: "A",
+                rationale: "Rủi ro vay nợ (Rủi ro tín dụng đối với người vay) là khả năng không thể thực hiện nghĩa vụ trả nợ (gốc và lãi) khi đến hạn."
+            },
+            {
+                id: 93,
+                question: "Nợ của gia đình là gì?",
+                options: [
+                    "A. Tất cả các khoản nợ phải trả cho chủ nợ vào ngày nhất định trong tương lai",
+                    "B. Các khoản vay chỉ bao gồm nợ gốc và lãi suất",
+                    "C. Tất cả các khoản vay không phải trả ngay lập tức",
+                    "D. Chỉ các khoản vay ngân hàng."
+                ],
+                answer: "A",
+                rationale: "Nợ (Debt/Liability) là nghĩa vụ tài chính phải trả cho một chủ nợ (cá nhân, tổ chức) tại một thời điểm xác định trong tương lai."
+            },
+            {
+                id: 94,
+                question: "Việc xây dựng kế hoạch tài chính cá nhân có thể được coi là gì?",
+                options: [
+                    "A. Một chiến lược dài hạn để tiết kiệm tiền",
+                    "B. Một quy trình thiết kế, thực hiện và giám sát kế hoạch tài chính để đạt được các mục tiêu trong tương lai",
+                    "C. Một cách thức đơn giản để chi tiêu và tiết kiệm tiền",
+                    "D. Một cách để tối đa hóa thu nhập."
+                ],
+                answer: "B",
+                rationale: "Kế hoạch tài chính cá nhân là một quy trình toàn diện, bao gồm việc đặt mục tiêu, lập ngân sách, tiết kiệm, đầu tư, bảo hiểm và giám sát."
+            },
+            {
+                id: 95,
+                question: "Nguyên tắc 'Xác định giá trị của tiền theo thời gian' yêu cầu gì đối với cá nhân, hộ gia đình?",
+                options: [
+                    "A. Đầu tư tất cả thu nhập vào một loại tài sản",
+                    "B. Đánh giá dòng tiền thu vào và chi ra trong các quyết định tài chính để so sánh giá trị của tiền tại các thời điểm khác nhau",
+                    "C. Chi tiêu không cần quan tâm đến thời gian",
+                    "D. Luôn ưu tiên tiết kiệm hơn chi tiêu."
+                ],
+                answer: "B",
+                rationale: "Giá trị thời gian của tiền (Time Value of Money) là nguyên tắc cốt lõi, khẳng định 1 đồng hôm nay giá trị hơn 1 đồng ngày mai. Do đó, cần quy đổi (chiết khấu) các dòng tiền về cùng một thời điểm để so sánh."
+            },
+            {
+                id: 96,
+                question: "Nguyên tắc 'Tính toán đến lợi ích và chi phí của các quyết định tài chính gắn với rủi ro' yêu cầu gì đối với các hộ gia đình?",
+                options: [
+                    "A. Chỉ tập trung vào việc tiết kiệm và không đầu tư",
+                    "B. Cân nhắc chi phí cơ hội, lợi ích kinh tế, và rủi ro khi đưa ra các quyết định tài chính",
+                    "C. Đầu tư tất cả tài sản vào chứng khoán mà không lo lắng về rủi ro",
+                    "D. Luôn chọn phương án an toàn nhất."
+                ],
+                answer: "B",
+                rationale: "Mọi quyết định tài chính đều có sự đánh đổi (Risk-Return Tradeoff) và chi phí cơ hội. Cần cân nhắc toàn diện các yếu tố này."
+            },
+            {
+                id: 97,
+                question: "'Chi phí cơ hội' trong tài chính cá nhân là gì?",
+                options: [
+                    "A. Chi phí cho các khoản vay nợ trong tương lai",
+                    "B. Lợi ích mà bạn từ bỏ khi lựa chọn một quyết định tài chính thay vì một lựa chọn khác",
+                    "C. Chi phí cho các khoản chi tiêu hàng tháng",
+                    "D. Tổng chi phí đầu tư."
+                ],
+                answer: "B",
+                rationale: "Chi phí cơ hội (Opportunity Cost) là giá trị của lựa chọn tốt nhất bị bỏ qua khi đưa ra một quyết định."
+            },
+            {
+                id: 98,
+                question: "Đâu là đặc điểm của thu nhập thường xuyên?",
+                options: [
+                    "A. Thu nhập này đến từ các nguồn tài chính không ổn định",
+                    "B. Thu nhập này chỉ phát sinh một lần trong năm",
+                    "C. Thu nhập này mang tính ổn định và dài hạn, có thể sử dụng cho nhu cầu chi tiêu thường xuyên",
+                    "D. Thu nhập từ trúng xổ số."
+                ],
+                answer: "C",
+                rationale: "Thu nhập thường xuyên (Regular Income) là nguồn thu ổn định, có thể dự đoán được, ví dụ: tiền lương, tiền cho thuê nhà."
+            },
+            {
+                id: 99,
+                question: "Chi tiêu cố định của cá nhân, hộ gia đình là gì?",
+                options: [
+                    "A. Các khoản chi tiêu có thể thay đổi hàng tháng",
+                    "B. Các khoản chi tiêu cho các hóa đơn hàng tháng định kỳ với số tiền tương tự mỗi tháng",
+                    "C. Các khoản chi tiêu cho giải trí và mua sắm",
+                    "D. Các khoản đầu tư."
+                ],
+                answer: "B",
+                rationale: "Chi tiêu cố định (Fixed Expenses) là những khoản chi bắt buộc, khó thay đổi trong ngắn hạn, ví dụ: tiền thuê nhà, tiền trả góp vay mua nhà."
+            },
+            {
+                id: 100,
+                question: "Khi lập kế hoạch tiết kiệm, 'quyết định nơi tiết kiệm' có nghĩa là gì?",
+                options: [
+                    "A. Chọn lựa giữa các khoản vay và tiết kiệm",
+                    "B. Xác định các hình thức tiết kiệm (ngân hàng, tổ chức tín dụng, nhóm tiết kiệm, tiết kiệm tại nhà) phù hợp với mục tiêu của mình",
+                    "C. Chọn các sản phẩm đầu tư có lãi suất cao",
+                    "D. Chỉ gửi ngân hàng."
+                ],
+                answer: "B",
+                rationale: "Lựa chọn 'nơi' tiết kiệm (phương tiện tiết kiệm) ảnh hưởng đến tính an toàn, thanh khoản và lãi suất (ví dụ: gửi ngân hàng, mua vàng, giữ tiền mặt)."
+            },
+            {
+                id: 101,
+                question: "Tài chính quốc tế là gì?",
+                options: [
+                    "A. Hệ thống các quan hệ tài chính giữa các chủ thể trong cùng một quốc gia.",
+                    "B. Hệ thống những quan hệ tài chính giữa các chủ thể của một quốc gia với các chủ thể của quốc gia khác và với các tổ chức quốc tế.",
+                    "C. Hệ thống những quan hệ tài chính chỉ liên quan đến các tổ chức quốc tế.",
+                    "D. Chỉ là hoạt động ngoại thương."
+                ],
+                answer: "B",
+                rationale: "Tài chính quốc tế (International Finance) nghiên cứu các quan hệ tài chính vượt qua biên giới quốc gia."
+            },
+            {
+                id: 102,
+                question: "Đầu tư trực tiếp nước ngoài (FDI) là gì?",
+                options: [
+                    "A. Hình thức đầu tư mà chủ đầu tư ở một quốc gia mua chứng khoán ở quốc gia khác.",
+                    "B. Hình thức đầu tư mà chủ đầu tư ở một quốc gia bỏ vốn vào một quốc gia khác để nắm một phần hoặc toàn bộ doanh nghiệp ở quốc gia đó.",
+                    "C. Hình thức cho vay vốn để thu lợi từ lãi suất.",
+                    "D. Hình thức viện trợ."
+                ],
+                answer: "B",
+                rationale: "FDI (Foreign Direct Investment) là hình thức đầu tư dài hạn, gắn liền với việc chuyển giao vốn, công nghệ và quyền quản lý, điều hành doanh nghiệp."
+            },
+            {
+                id: 103,
+                question: "Đầu tư gián tiếp nước ngoài (FPI) là gì?",
+                options: [
+                    "A. Hình thức đầu tư mà các chủ thể tham gia điều hành doanh nghiệp ở quốc gia khác.",
+                    "B. Hình thức đầu tư mà các chủ thể mua chứng khoán, trái phiếu hoặc cổ phiếu quốc tế để hưởng lợi tức mà không tham gia điều hành.",
+                    "C. Hình thức đầu tư mà chủ thể bỏ vốn vào doanh nghiệp ở quốc gia khác.",
+                    "D. Hình thức đầu tư mới 100% vốn."
+                ],
+                answer: "B",
+                rationale: "FPI (Foreign Portfolio Investment) là hình thức đầu tư tài chính thuần túy, không gắn với quyền quản lý trực tiếp doanh nghiệp."
+            },
+            {
+                id: 104,
+                question: "Tín dụng quốc tế là gì?",
+                options: [
+                    "A. Hình thức đầu tư gián tiếp thông qua việc mua cổ phiếu quốc tế.",
+                    "B. Hình thức đầu tư gián tiếp, trong đó chủ thể cho vay vốn và thu lợi từ lãi suất đã được thỏa thuận trong các Hiệp định hay khế ước vay vốn.",
+                    "C. Hình thức viện trợ không hoàn lại từ các tổ chức quốc tế.",
+                    "D. Hình thức FDI."
+                ],
+                answer: "B",
+                rationale: "Tín dụng quốc tế là quan hệ vay nợ (cho vay và đi vay) giữa các chủ thể ở các quốc gia khác nhau."
+            },
+            {
+                id: 105,
+                question: "Viện trợ phát triển chính thức (ODA) là gì?",
+                options: [
+                    "A. Khoản cho vay không lãi suất giữa các quốc gia phát triển.",
+                    "B. Khoản cho vay ưu đãi từ các Chính phủ và tổ chức tài chính quốc tế đối với các nước đang phát triển để hỗ trợ phát triển kinh tế.",
+                    "C. Khoản viện trợ không hoàn lại từ các tổ chức phi Chính phủ.",
+                    "D. Khoản vay thương mại."
+                ],
+                answer: "B",
+                rationale: "ODA (Official Development Assistance) là nguồn vốn hỗ trợ phát triển, có tính ưu đãi (lãi suất thấp, ân hạn dài, hoặc không hoàn lại) từ các tổ chức chính thức."
+            },
+            {
+                id: 106,
+                question: "Viện trợ quốc tế không hoàn lại có đặc điểm gì?",
+                options: [
+                    "A. Nước tiếp nhận phải hoàn lại vốn cho các nhà viện trợ.",
+                    "B. Là hình thức cấp vốn mà nước tiếp nhận không phải hoàn lại cho các nhà viện trợ.",
+                    "C. Nước viện trợ cung cấp vốn với lãi suất thấp.",
+                    "D. Là khoản vay thương mại."
+                ],
+                answer: "B",
+                rationale: "Đúng như tên gọi, viện trợ không hoàn lại (Grant) là hình thức cho tặng, nước nhận không có nghĩa vụ trả lại vốn gốc."
+            },
+            {
+                id: 107,
+                question: "Tỷ giá thị trường là gì?",
+                options: [
+                    "A. Là tỷ giá do nhà nước công bố cho các hoạt động mua bán ngoại tệ.",
+                    "B. Là tỷ giá xác định dựa trên tỷ giá chính thức và quan hệ cung cầu về ngoại tệ trên thị trường.",
+                    "C. Là tỷ giá không thay đổi suốt cả ngày.",
+                    "D. Là tỷ giá do IMF ấn định."
+                ],
+                answer: "B",
+                rationale: "Tỷ giá thị trường (Market Rate) là tỷ giá thực tế diễn ra giao dịch, được hình thành dựa trên quan hệ cung - cầu ngoại tệ."
+            },
+            {
+                id: 108,
+                question: "Tỷ giá hối đoái là gì?",
+                options: [
+                    "A. Giá trị của một đồng tiền trong nước so với vàng",
+                    "B. Giá trị của một đồng tiền trong nước so với đồng tiền của một quốc gia khác",
+                    "C. Mức độ sản xuất hàng hóa trong một quốc gia",
+                    "D. Tỷ lệ lạm phát."
+                ],
+                answer: "B",
+                rationale: "Tỷ giá hối đoái (Exchange Rate) là giá cả của một đồng tiền này được biểu thị bằng một đồng tiền khác."
+            },
+            {
+                id: 109,
+                question: "Tự do hóa giao dịch vốn là quá trình:",
+                options: [
+                    "A. Dỡ bỏ các hạn chế đối với các giao dịch vốn quốc tế.",
+                    "B. Tăng cường kiểm soát các luồng vốn ra vào quốc gia.",
+                    "C. Cấm các giao dịch vốn quốc tế.",
+                    "D. Chỉ cho phép FDI."
+                ],
+                answer: "A",
+                rationale: "Tự do hóa giao dịch vốn (Capital Account Liberalization) là việc giảm bớt hoặc dỡ bỏ các rào cản hành chính, pháp lý đối với các luồng vốn (FDI, FPI, Tín dụng) ra vào quốc gia."
+            },
+            {
+                id: 110,
+                question: "Tự do hóa tài chính quốc tế bao gồm:",
+                options: [
+                    "A. Tự do hóa giao dịch vốn và tự do hóa giao dịch vãng lai.",
+                    "B. Giới hạn giao dịch vãng lai và giao dịch vốn quốc tế.",
+                    "C. Tăng cường kiểm soát vốn quốc tế và giao dịch vãng lai.",
+                    "D. Chỉ tự do hóa FDI."
+                ],
+                answer: "A",
+                rationale: "Tự do hóa tài chính bao gồm cả tự do hóa tài khoản vốn (Capital Account) và tài khoản vãng lai (Current Account - liên quan đến thương mại, dịch vụ)."
+            },
+            {
+                id: 111,
+                question: "Theo tính chất pháp lý, thị trường tài chính có thể được chia thành:",
+                options: [
+                    "A. Thị trường trái phiếu và thị trường cổ phiếu",
+                    "B. Thị trường giao ngay và thị trường kỳ hạn",
+                    "C. Thị trường chính thức và thị trường không chính thức",
+                    "D. Thị trường tiền tệ và thị trường vốn."
+                ],
+                answer: "C",
+                rationale: "Thị trường chính thức (tập trung, có tổ chức như Sở giao dịch) và thị trường không chính thức (phi tập trung - OTC, hoặc thị trường 'chợ đen')."
+            },
+            {
+                id: 112,
+                question: "Theo thời gian hoạt động (kỳ hạn của công cụ), thị trường tài chính có thể chia thành:",
+                options: [
+                    "A. Thị trường sơ cấp và thị trường thứ cấp",
+                    "B. Thị trường tiền tệ và thị trường vốn",
+                    "C. Thị trường ngoại hối và thị trường vàng",
+                    "D. Thị trường nợ và thị trường vốn chủ sở hữu."
+                ],
+                answer: "B",
+                rationale: "Thị trường tiền tệ (ngắn hạn, dưới 1 năm) và Thị trường vốn (dài hạn, trên 1 năm)."
+            },
+            {
+                id: 113,
+                question: "Công cụ tài chính nào sau đây là một dạng hợp đồng tài chính giữa hai bên để chắc chắn mua bán một tài sản trong tương lai với mức giá xác định từ trước?",
+                options: [
+                    "A. Hợp đồng quyền chọn",
+                    "B. Hợp đồng tương lai",
+                    "C. Trái phiếu",
+                    "D. Cổ phiếu."
+                ],
+                answer: "B",
+                rationale: "Hợp đồng tương lai (Futures) và Hợp đồng kỳ hạn (Forwards) là nghĩa vụ bắt buộc. Quyền chọn (Options) là quyền, không phải nghĩa vụ."
+            },
+            {
+                id: 114,
+                question: "Đặc điểm nào sau đây không phải của hợp đồng tương lai (futures)?",
+                options: [
+                    "A. Là hợp đồng tài chính được chuẩn hóa và giao dịch trên sàn",
+                    "B. Có thể được sử dụng để đầu cơ hoặc phòng ngừa rủi ro",
+                    "C. Cung cấp quyền chọn mua hoặc bán một tài sản tại một mức giá xác định",
+                    "D. Yêu cầu ký quỹ."
+                ],
+                answer: "C",
+                rationale: "Hợp đồng tương lai là nghĩa vụ bắt buộc, không phải quyền chọn. Quyền chọn (Option) mới cung cấp quyền mua hoặc bán."
+            },
+            {
+                id: 115,
+                question: "Quyền chọn bán (Put Option) cho phép người sở hữu quyền gì?",
+                options: [
+                    "A. Quyền mua tài sản ở mức giá đã xác định trước",
+                    "B. Quyền bán tài sản ở mức giá đã xác định trước",
+                    "C. Quyền được trả cổ tức từ công ty phát hành",
+                    "D. Nghĩa vụ phải bán tài sản."
+                ],
+                answer: "B",
+                rationale: "Put Option (Quyền chọn bán) cho phép người nắm giữ 'bán' tài sản cơ sở ở mức giá đã chốt (strike price)."
+            },
+            {
+                id: 116,
+                question: "Đặc điểm nổi bật của chứng chỉ quỹ là gì?",
+                options: [
+                    "A. Chứng chỉ quỹ giúp nhà đầu tư sở hữu một phần của quỹ đầu tư",
+                    "B. Chứng chỉ quỹ chỉ có thể giao dịch giữa các quỹ",
+                    "C. Chứng chỉ quỹ chỉ đầu tư vào trái phiếu chính phủ",
+                    "D. Chứng chỉ quỹ là một công cụ nợ."
+                ],
+                answer: "A",
+                rationale: "Chứng chỉ quỹ (Fund Certificate) tương tự như cổ phiếu, xác nhận quyền sở hữu của nhà đầu tư đối với một phần vốn góp trong quỹ đầu tư."
+            },
+            {
+                id: 117,
+                question: "Đặc điểm nổi bật của trái phiếu là gì?",
+                options: [
+                    "A. Trái phiếu này có thể được công ty phát hành mua lại hoặc được tổ chức tài chính trung gian cho vay chiết khấu/cầm cố trước ngày đáo hạn",
+                    "B. Trái phiếu này chỉ trả lãi định kỳ mà không có giá trị gốc",
+                    "C. Trái phiếu này không có ngày đáo hạn",
+                    "D. Người nắm giữ có quyền biểu quyết."
+                ],
+                answer: "A",
+                rationale: "Trái phiếu có tính thanh khoản, có thể được mua lại, hoặc dùng làm tài sản thế chấp. Đáp án B và C (trừ trái phiếu vĩnh cửu) và D là sai."
+            },
+            {
+                id: 118,
+                question: "Đặc điểm của hợp đồng hoán đổi là gì?",
+                options: [
+                    "A. Là hợp đồng giữa hai bên để trao đổi dòng tiền với nhau, thường là lãi suất hoặc tiền tệ",
+                    "B. Là hợp đồng tài chính có giá trị cố định",
+                    "C. Là một loại cổ phiếu với quyền biểu quyết",
+                    "D. Chỉ giao dịch trên sàn tập trung."
+                ],
+                answer: "A",
+                rationale: "Hợp đồng hoán đổi (Swap) là một thỏa thuận trao đổi các dòng tiền trong tương lai theo một công thức định trước (ví dụ: hoán đổi lãi suất cố định lấy thả nổi)."
+            },
+            {
+                id: 119,
+                question: "Công cụ nào dưới đây giúp nhà đầu tư có thể mua tài sản tại mức giá hiện tại mà không phải thực hiện nghĩa vụ mua khi hết hạn?",
+                options: [
+                    "A. Quyền chọn mua",
+                    "B. Hợp đồng tương lai",
+                    "C. Trái phiếu",
+                    "D. Hợp đồng kỳ hạn."
+                ],
+                answer: "A",
+                rationale: "Quyền chọn mua (Call Option) cho phép người mua có 'quyền' (nhưng không phải nghĩa vụ) mua tài sản ở giá đã chốt."
+            },
+            {
+                id: 120,
+                question: "Công cụ tài chính nào sau đây không được giao dịch trên sàn chứng khoán?",
+                options: [
+                    "A. Cổ phiếu",
+                    "B. Hợp đồng tương lai",
+                    "C. Hợp đồng hoán đổi",
+                    "D. Quyền chọn (niêm yết)"
+                ],
+                answer: "C",
+                rationale: "Hợp đồng hoán đổi (Swaps) và Hợp đồng kỳ hạn (Forwards) là các công cụ phái sinh chủ yếu được giao dịch trên thị trường phi tập trung (OTC)."
+            },
+            {
+                id: 121,
+                question: "Cổ phiếu của công ty được giao dịch trên thị trường nào?",
+                options: [
+                    "A. Thị trường hàng hóa",
+                    "B. Thị trường ngoại hối",
+                    "C. Thị trường chứng khoán",
+                    "D. Thị trường tiền tệ."
+                ],
+                answer: "C",
+                rationale: "Thị trường chứng khoán (Stock Market) là một bộ phận của thị trường vốn, chuyên giao dịch cổ phiếu và các chứng khoán vốn khác."
+            },
+            {
+                id: 122,
+                question: "Người vay và người cho vay giao dịch chủ yếu trên thị trường nào?",
+                options: [
+                    "A. Thị trường trái phiếu",
+                    "B. Thị trường tài chính thứ cấp",
+                    "C. Thị trường tiền tệ",
+                    "D. Thị trường tín dụng (một phần của thị trường tiền tệ và thị trường vốn)"
+                ],
+                answer: "D",
+                rationale: "Thị trường tín dụng (cho vay) bao gồm cả ngắn hạn (thị trường tiền tệ) và dài hạn (thị trường vốn). Trong các lựa chọn, 'Thị trường tiền tệ' (C) là nơi diễn ra các khoản vay ngắn hạn (như liên ngân hàng)."
+            },
+            {
+                id: 123,
+                question: "Trái phiếu chính phủ là loại trái phiếu do:",
+                options: [
+                    "A. Các công ty tư nhân phát hành",
+                    "B. Chính phủ phát hành để huy động vốn cho các dự án công",
+                    "C. Các ngân hàng phát hành để huy động vốn cho vay",
+                    "D. IMF phát hành."
+                ],
+                answer: "B",
+                rationale: "Trái phiếu chính phủ (Government Bonds) do Chính phủ (thông qua Kho bạc) phát hành để huy động vốn, bù đắp thâm hụt NSNN."
+            },
+            {
+                id: 124,
+                question: "Chính phủ tham gia vào thị trường tài chính chủ yếu thông qua:",
+                options: [
+                    "A. Phát hành trái phiếu chính phủ để huy động vốn",
+                    "B. Đầu tư vào các quỹ hưu trí",
+                    "C. Cung cấp tín dụng cho các doanh nghiệp",
+                    "D. Phát hành cổ phiếu."
+                ],
+                answer: "A",
+                rationale: "Chính phủ là nhà phát hành lớn nhất trên thị trường nợ (thị trường vốn và thị trường tiền tệ) thông qua việc phát hành trái phiếu, tín phiếu."
+            },
+            {
+                id: 125,
+                question: "Trái phiếu chính phủ là loại trái phiếu do:",
+                options: [
+                    "A. Các công ty tư nhân phát hành",
+                    "B. Chính phủ phát hành để huy động vốn cho các dự án công",
+                    "C. Các ngân hàng phát hành để huy động vốn cho vay",
+                    "D. Các tập đoàn lớn."
+                ],
+                answer: "B",
+                rationale: "Đây là câu hỏi lặp lại (giống câu 123), đáp án vẫn là B."
+            },
+            {
+                id: 126,
+                question: "Trái phiếu chuyển đổi là gì?",
+                options: [
+                    "A. Trái phiếu có thể chuyển đổi thành cổ phiếu của công ty phát hành",
+                    "B. Trái phiếu có thể chuyển đổi thành tiền mặt vào bất kỳ thời điểm nào",
+                    "C. Trái phiếu được phát hành với lãi suất thấp hơn thị trường",
+                    "D. Trái phiếu có thể chuyển đổi sang ngoại tệ."
+                ],
+                answer: "A",
+                rationale: "Trái phiếu chuyển đổi (Convertible Bond) cho phép trái chủ quyền chuyển đổi trái phiếu (nợ) thành cổ phiếu (vốn chủ sở hữu) của công ty phát hành."
+            },
+            {
+                id: 127,
+                question: "Nhà phát hành trái phiếu có nghĩa vụ gì đối với các nhà đầu tư trái phiếu?",
+                options: [
+                    "A. Trả lại vốn gốc và lãi suất đúng hạn theo hợp đồng phát hành",
+                    "B. Cung cấp cổ tức cho các nhà đầu tư trái phiếu",
+                    "C. Chia sẻ lợi nhuận kinh doanh với các nhà đầu tư trái phiếu",
+                    "D. Cho phép nhà đầu tư tham gia biểu quyết."
+                ],
+                answer: "A",
+                rationale: "Người nắm giữ trái phiếu là chủ nợ, do đó tổ chức phát hành (con nợ) có nghĩa vụ thanh toán gốc và lãi đúng hạn."
+            },
+            {
+                id: 128,
+                question: "Nhà phát hành phải chịu trách nhiệm gì khi phát hành chứng khoán ra công chúng?",
+                options: [
+                    "A. Đảm bảo rằng chứng khoán phát hành sẽ không giảm giá",
+                    "B. Cung cấp thông tin đầy đủ, chính xác và minh bạch cho nhà đầu tư",
+                    "C. Đảm bảo giá cổ phiếu sẽ luôn tăng",
+                    "D. Đảm bảo trả cổ tức."
+                ],
+                answer: "B",
+                rationale: "Trách nhiệm pháp lý quan trọng nhất của nhà phát hành là công bố thông tin (Disclosure) một cách trung thực, minh bạch."
+            },
+            {
+                id: 129,
+                question: "Thị trường liên ngân hàng thuộc thị trường nào?",
+                options: [
+                    "A. Thị trường cho vay ngắn hạn",
+                    "B. Thị trường tiền tệ",
+                    "C. Thị trường chứng khoán sơ cấp",
+                    "D. Thị trường vốn."
+                ],
+                answer: "B",
+                rationale: "Thị trường liên ngân hàng (Interbank Market) là nơi các ngân hàng vay mượn lẫn nhau, chủ yếu là các khoản vay rất ngắn hạn (qua đêm, 1 tuần), là bộ phận cốt lõi của thị trường tiền tệ."
+            },
+            {
+                id: 130,
+                question: "Nhà phát hành trên thị trường tài chính là gì?",
+                options: [
+                    "A. Là các nhà đầu tư tham gia mua bán tài sản tài chính trên thị trường",
+                    "B. Là các tổ chức phát hành tài sản tài chính để huy động vốn cho các hoạt động của mình",
+                    "C. Là các cơ quan quản lý thị trường tài chính",
+                    "D. Là các công ty môi giới."
+                ],
+                answer: "B",
+                rationale: "Nhà phát hành (Issuer) là các chủ thể cần vốn (Chính phủ, Doanh nghiệp) và họ phát hành (bán) chứng khoán để huy động vốn."
+            },
+            {
+                id: 131,
+                question: "Chính phủ và chính quyền địa phương thường phát hành các tài sản tài chính nào trên thị trường?",
+                options: [
+                    "A. Chứng khoán doanh nghiệp",
+                    "B. Trái phiếu chính phủ, tín phiếu kho bạc, công trái xây dựng tổ quốc",
+                    "C. Cổ phiếu của các doanh nghiệp nhà nước",
+                    "D. Chứng chỉ quỹ."
+                ],
+                answer: "B",
+                rationale: "Đây là các công cụ nợ (ngắn hạn và dài hạn) mà Chính phủ và chính quyền địa phương sử dụng để huy động vốn."
+            },
+            {
+                id: 132,
+                question: "Nhà đầu tư tổ chức là gì?",
+                options: [
+                    "A. Là các cá nhân tham gia mua bán tài sản tài chính với số vốn nhỏ",
+                    "B. Là các tổ chức thực hiện đầu tư với quy mô lớn và giao dịch thường xuyên",
+                    "C. Là các cơ quan nhà nước tham gia mua bán tài sản tài chính",
+                    "D. Là các doanh nghiệp."
+                ],
+                answer: "B",
+                rationale: "Nhà đầu tư tổ chức (Institutional Investors) là các định chế tài chính như quỹ đầu tư, công ty bảo hiểm, quỹ hưu trí... đầu tư chuyên nghiệp với quy mô lớn."
+            },
+            {
+                id: 133,
+                question: "Sở giao dịch chứng khoán có vai trò gì trên thị trường tài chính?",
+                options: [
+                    "A. Là tổ chức cung cấp các dịch vụ tư vấn đầu tư",
+                    "B. Là thị trường chứng khoán tập trung, nơi tổ chức giao dịch các chứng khoán niêm yết",
+                    "C. Là nơi cung cấp thông tin cho nhà đầu tư",
+                    "D. Là nơi phát hành chứng khoán."
+                ],
+                answer: "B",
+                rationale: "Sở giao dịch (Stock Exchange) là một thị trường chính thức, tập trung, nơi các giao dịch được tổ chức và giám sát chặt chẽ."
+            },
+            {
+                id: 134,
+                question: "Các công ty xếp hạng tín nhiệm có chức năng gì?",
+                options: [
+                    "A. Cung cấp thông tin về thị trường tài chính cho nhà đầu tư",
+                    "B. Đánh giá khả năng trả nợ và tiềm lực tài chính của tổ chức phát hành",
+                    "C. Thực hiện các giao dịch chứng khoán trên thị trường",
+                    "D. Quản lý danh mục đầu tư."
+                ],
+                answer: "B",
+                rationale: "Các công ty như Moody's, S&P, Fitch cung cấp các đánh giá (xếp hạng) về rủi ro tín dụng của các tổ chức phát hành (Chính phủ, Doanh nghiệp)."
+            },
+            {
+                id: 135,
+                question: "Ngân hàng Trung ương có vai trò gì đối với thị trường tài chính?",
+                options: [
+                    "A. Quản lý các giao dịch chứng khoán và giám sát các công ty chứng khoán",
+                    "B. Quản lý tiền tệ, phát hành tiền và điều tiết các biến số kinh tế vĩ mô có ảnh hưởng đến thị trường tài chính",
+                    "C. Hướng dẫn các nhà đầu tư cá nhân trong việc đưa ra quyết định đầu tư",
+                    "D. Trực tiếp cho doanh nghiệp vay."
+                ],
+                answer: "B",
+                rationale: "NHTW điều hành chính sách tiền tệ, ảnh hưởng đến lãi suất, lạm phát và cung tiền, từ đó tác động lớn đến thị trường tài chính."
+            },
+            {
+                id: 136,
+                question: "Thị trường phi tập trung (OTC) có đặc điểm gì?",
+                options: [
+                    "A. Các giao dịch được thực hiện tại một sàn giao dịch cụ thể",
+                    "B. Các giao dịch không có sự tham gia của các nhà môi giới chứng khoán",
+                    "C. Các giao dịch được thực hiện qua quầy của các ngân hàng hoặc công ty chứng khoán",
+                    "D. Chỉ giao dịch cổ phiếu."
+                ],
+                answer: "C",
+                rationale: "Thị trường OTC (Over-The-Counter) không có địa điểm giao dịch tập trung, mà diễn ra qua mạng lưới các nhà tạo lập thị trường (dealers) như ngân hàng, công ty chứng khoán."
+            },
+            {
+                id: 137,
+                question: "Các bộ phận cơ bản của thị trường tiền tệ bao gồm những gì?",
+                options: [
+                    "A. Thị trường liên ngân hàng, thị trường tín dụng ngắn hạn, thị trường ngoại tệ",
+                    "B. Thị trường chứng khoán, thị trường ngoại tệ, thị trường vàng",
+                    "C. Thị trường vốn, thị trường trái phiếu, thị trường ngoại tệ",
+                    "D. Thị trường cổ phiếu và thị trường trái phiếu."
+                ],
+                answer: "A",
+                rationale: "Thị trường tiền tệ bao gồm các thị trường con giao dịch công cụ ngắn hạn: thị trường tín phiếu, liên ngân hàng, tín dụng ngắn hạn, ngoại hối (giao ngay/kỳ hạn ngắn)."
+            },
+            {
+                id: 138,
+                question: "Tín phiếu Ngân hàng trung ương chủ yếu được phát hành để làm gì?",
+                options: [
+                    "A. Hỗ trợ các doanh nghiệp phát triển",
+                    "B. Huy động vốn cho Chính phủ",
+                    "C. Thực hiện chính sách tiền tệ quốc gia",
+                    "D. Cho vay thương mại."
+                ],
+                answer: "C",
+                rationale: "NHTW phát hành tín phiếu (nghiệp vụ thị trường mở) với mục đích hút bớt tiền từ lưu thông về, là công cụ để thực hiện chính sách tiền tệ thắt chặt."
+            },
+            {
+                id: 139,
+                question: "Tín phiếu doanh nghiệp là công cụ tài chính do ai phát hành?",
+                options: [
+                    "A. Chính phủ",
+                    "B. Ngân hàng trung ương",
+                    "C. Các doanh nghiệp lớn có uy tín trên thị trường",
+                    "D. Các ngân hàng thương mại."
+                ],
+                answer: "C",
+                rationale: "Tín phiếu doanh nghiệp (Commercial Paper) là giấy nợ ngắn hạn, không cần tài sản đảm bảo, do các doanh nghiệp có uy tín cao phát hành."
+            },
+            {
+                id: 140,
+                question: "Đặc điểm nào sau đây đúng về thương phiếu?",
+                options: [
+                    "A. Thương phiếu chỉ được phát hành bởi Chính phủ",
+                    "B. Thương phiếu có thể được chuyển nhượng, cầm cố, hoặc chiết khấu tại ngân hàng",
+                    "C. Thương phiếu không có kỳ hạn và có lãi suất cố định",
+                    "D. Thương phiếu là cổ phiếu."
+                ],
+                answer: "B",
+                rationale: "Thương phiếu (hối phiếu, lệnh phiếu) phát sinh trong quan hệ mua bán chịu, có thể được chiết khấu tại ngân hàng để nhận tiền trước hạn."
+            },
+            {
+                id: 141,
+                question: "Các tổ chức tài chính trung gian đóng vai trò gì trong nền kinh tế?",
+                options: [
+                    "A. Chỉ cung cấp tín dụng cho các ngân hàng thương mại.",
+                    "B. Kết nối giữa các nhà có vốn với các chủ thể cần vốn.",
+                    "C. Đảm bảo thanh khoản cho các chính phủ.",
+                    "D. In tiền."
+                ],
+                answer: "B",
+                rationale: "Vai trò cốt lõi của trung gian tài chính là làm cầu nối, luân chuyển vốn từ nơi thừa (người tiết kiệm) đến nơi thiếu (người đầu tư/vay)."
+            },
+            {
+                id: 142,
+                question: "Chức năng chính của các tổ chức tài chính trung gian là gì?",
+                options: [
+                    "A. Giảm lãi suất tín dụng cho các doanh nghiệp.",
+                    "B. Giúp tiết kiệm chi phí giao dịch và giảm rủi ro khi kết nối giữa người thừa vốn và người cần vốn.",
+                    "C. Phát hành trái phiếu Chính phủ.",
+                    "D. Điều hành chính sách tiền tệ."
+                ],
+                answer: "B",
+                rationale: "Các trung gian tài chính giảm chi phí tìm kiếm (search costs), chi phí thông tin (information costs) và rủi ro (risk) cho các bên tham gia."
+            },
+            {
+                id: 143,
+                question: "Các định chế tài chính trung gian có thể làm gì để giảm thiểu rủi ro tín dụng?",
+                options: [
+                    "A. Giới hạn cho vay cho các doanh nghiệp quốc doanh",
+                    "B. Sử dụng mô hình tín dụng và phân tích rủi ro để đánh giá khả năng trả nợ của người vay",
+                    "C. Tạo ra các khoản vay với lãi suất cố định thấp hơn",
+                    "D. Chỉ cho vay ngắn hạn."
+                ],
+                answer: "B",
+                rationale: "Các trung gian (như ngân hàng) có chuyên môn trong việc sàng lọc, thẩm định và giám sát người vay để giảm thiểu rủi ro vỡ nợ."
+            },
+            {
+                id: 144,
+                question: "Ngân hàng thương mại có những chức năng chủ yếu nào?",
+                options: [
+                    "A. Chức năng trung gian tín dụng",
+                    "B. Chức năng trung gian tín dụng, trung gian thanh toán",
+                    "C. Chức năng đầu tư",
+                    "D. Chức năng phát hành tiền."
+                ],
+                answer: "B",
+                rationale: "NHTM có 3 chức năng chính: Trung gian tín dụng (huy động và cho vay), Trung gian thanh toán (cung cấp dịch vụ thanh toán hộ) và Tạo tiền (tạo bút tệ)."
+            },
+            {
+                id: 145,
+                question: "Một trong những lợi ích của việc phân tán rủi ro là:",
+                options: [
+                    "A. Đảm bảo lợi nhuận cao nhất cho nhà đầu tư",
+                    "B. Giảm thiểu tác động của biến động thị trường đối với các nhà đầu tư",
+                    "C. Tăng độ rủi ro cho các tổ chức tài chính",
+                    "D. Chỉ áp dụng cho ngân hàng."
+                ],
+                answer: "B",
+                rationale: "Phân tán rủi ro (Diversification) giúp giảm thiểu rủi ro phi hệ thống, làm cho danh mục đầu tư ổn định hơn trước các biến động."
+            },
+            {
+                id: 146,
+                question: "Một trong những cách mà các định chế tài chính trung gian có thể giảm thiểu chi phí đầu tư là:",
+                options: [
+                    "A. Tăng cường đầu tư vào các dự án có rủi ro cao",
+                    "B. Tập trung vào đầu tư vào một nhóm tài sản duy nhất",
+                    "C. Tận dụng quy mô lớn để giảm chi phí giao dịch và tìm kiếm cơ hội đầu tư",
+                    "D. Tránh xa thị trường chứng khoán."
+                ],
+                answer: "C",
+                rationale: "Nhờ lợi thế về quy mô (Economies of Scale), các trung gian tài chính có chi phí giao dịch trên mỗi đơn vị vốn thấp hơn nhiều so với nhà đầu tư cá nhân."
+            },
+            {
+                id: 147,
+                question: "Chức năng chính của công ty bảo hiểm là gì?",
+                options: [
+                    "A. Cung cấp vốn cho các công ty phát triển",
+                    "B. Bảo vệ người tham gia bảo hiểm khỏi các rủi ro tài chính",
+                    "C. Phân phối nguồn vốn cho các dự án công nghiệp",
+                    "D. Cho vay tiêu dùng."
+                ],
+                answer: "B",
+                rationale: "Bảo hiểm hoạt động dựa trên nguyên tắc chia sẻ rủi ro (Risk Pooling), giúp cá nhân/tổ chức được bồi thường khi rủi ro xảy ra."
+            },
+            {
+                id: 148,
+                question: "Một đặc điểm của các định chế tài chính trung gian là gì?",
+                options: [
+                    "A. Họ trực tiếp phát hành tiền tệ",
+                    "B. Họ không chịu bất kỳ loại hình kiểm soát nào từ chính phủ",
+                    "C. Họ thay mặt các nhà đầu tư phân phối nguồn lực tài chính vào nền kinh tế",
+                    "D. Họ chỉ hoạt động phi lợi nhuận."
+                ],
+                answer: "C",
+                rationale: "Họ đóng vai trò trung gian, huy động vốn từ người tiết kiệm (nhà đầu tư) và phân phối (cho vay/đầu tư) vào nền kinh tế."
+            },
+            {
+                id: 149,
+                question: "Việc phân tán các khoản đầu tư có thể giúp các tổ chức tài chính giảm thiểu chi phí đầu tư vì:",
+                options: [
+                    "A. Việc phân tán giúp giảm thiểu rủi ro và chi phí tìm kiếm thông tin cho mỗi khoản đầu tư",
+                    "B. Phân tán các khoản đầu tư làm tăng khả năng sinh lời cho các nhà đầu tư",
+                    "C. Phân tán đầu tư làm giảm chi phí quản lý cho các tổ chức tài chính",
+                    "D. Phân tán đầu tư làm tăng rủi ro."
+                ],
+                answer: "A",
+                rationale: "Đa dạng hóa giúp giảm rủi ro phi hệ thống. Thay vì phải tự tìm hiểu 100 công ty, nhà đầu tư chỉ cần mua chứng chỉ quỹ (đã được đa dạng hóa)."
+            },
+            {
+                id: 150,
+                question: "Cách nào dưới đây có thể giúp các tổ chức tài chính trung gian giảm chi phí tìm kiếm thông tin?",
+                options: [
+                    "A. Tập trung vào một số lượng nhỏ các tài sản và không mở rộng danh mục đầu tư",
+                    "B. Tận dụng công nghệ và hệ thống thông tin hiện đại để thu thập và phân tích dữ liệu",
+                    "C. Đầu tư vào các tài sản có mức độ rủi ro cao để thu được lợi nhuận nhanh chóng",
+                    "D. Chỉ dựa vào thông tin công khai."
+                ],
+                answer: "B",
+                rationale: "Các trung gian tài chính có chuyên môn và công nghệ để sàng lọc, thẩm định thông tin (giảm bất cân xứng thông tin) hiệu quả hơn cá nhân."
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let answeredQuestions = [];
+        let isAnswered = false;
+
+        function renderQuiz() {
+            const quizArea = document.getElementById('quiz-area');
+            quizArea.innerHTML = ''; // Clear previous content
+
+            if (currentQuestionIndex >= quizData.length) {
+                renderResults(quizArea);
+                return;
+            }
+
+            const currentQ = quizData[currentQuestionIndex];
+            isAnswered = answeredQuestions.includes(currentQ.id);
+
+            const optionsHtml = currentQ.options.map((option, index) => {
+                const optionLetter = String.fromCharCode(65 + index);
+                let classes = 'option-button w-full p-4 mt-3 rounded-xl shadow hover:shadow-lg transition-all duration-200 ';
+                let clickHandler = `selectOption(${currentQ.id}, '${optionLetter}')`;
+                
+                // If answered, set correct/incorrect classes
+                if (isAnswered) {
+                    const userSelection = currentQ.userAnswer;
+                    if (optionLetter === currentQ.answer) {
+                        // Correct answer
+                        classes += 'bg-green-100 text-green-800 border-2 border-green-500 font-semibold';
+                    } else if (optionLetter === userSelection && optionLetter !== currentQ.answer) {
+                        // User's wrong answer
+                        classes += 'bg-red-100 text-red-800 border-2 border-red-500 font-semibold';
+                    } else {
+                        // Other unanswered options
+                        classes += 'bg-gray-50 text-gray-700 hover:bg-gray-100';
+                    }
+                    clickHandler = ''; // Disable click
+                } else {
+                    classes += 'bg-gray-50 text-gray-700 hover:bg-blue-50 hover:text-blue-700 active:bg-blue-100';
+                }
+
+                return `
+                    <button class="${classes}" onclick="${clickHandler}" id="option-${optionLetter}">
+                        <span class="font-bold mr-3 text-lg">${optionLetter}.</span> ${option.substring(3).trim()}
+                    </button>
+                `;
+            }).join('');
+
+            const questionHtml = `
+                <div class="question-wrapper">
+                    <div class="flex justify-between items-center mb-4">
+                        <p class="text-sm font-medium text-blue-600">Câu hỏi ${currentQ.id} / ${quizData.length} (Bộ ${totalQuestions} câu)</p>
+                        <p class="text-sm font-medium text-gray-500">Điểm hiện tại: <span class="font-bold text-gray-700">${score}</span></p>
+                    </div>
+                    <h2 class="text-xl font-bold text-gray-900 mb-6 p-4 bg-blue-50 border-l-4 border-blue-500 rounded-lg shadow-sm">
+                        ${currentQ.question}
+                    </h2>
+                    <div id="options-container" class="space-y-3">
+                        ${optionsHtml}
+                    </div>
+                </div>
+                
+                <div id="rationale-area" class="mt-8 p-4 bg-yellow-50 border-l-4 border-yellow-500 rounded-xl transition-all duration-300 ${isAnswered ? '' : 'hidden'}">
+                    <p class="text-lg font-bold text-gray-800 mb-2">Giải thích chi tiết:</p>
+                    <p class="text-gray-700">${currentQ.rationale}</p>
+                    <p class="mt-2 text-green-700 font-bold">Đáp án đúng là: ${currentQ.answer}</p>
+                </div>
+
+                <div class="flex justify-between mt-8 pt-4 border-t border-gray-200">
+                    <button onclick="navigateQuestion(-1)" ${currentQuestionIndex === 0 ? 'disabled' : ''} class="px-4 py-2 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 disabled:opacity-50 transition-all duration-200">
+                        <i class="fas fa-chevron-left mr-2"></i> Câu trước
+                    </button>
+                    <button onclick="navigateQuestion(1)" id="next-button" ${!isAnswered ? 'disabled' : ''} class="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:bg-gray-400 transition-all duration-200">
+                        ${currentQuestionIndex === quizData.length - 1 ? 'Xem kết quả' : 'Câu tiếp theo'} <i class="fas fa-chevron-right ml-2"></i>
+                    </button>
+                </div>
+            `;
+            quizArea.innerHTML = questionHtml;
+        }
+
+        function selectOption(qId, selectedLetter) {
+            const currentQ = quizData.find(q => q.id === qId);
+            if (answeredQuestions.includes(qId)) return;
+
+            currentQ.userAnswer = selectedLetter;
+            answeredQuestions.push(qId);
+            isAnswered = true;
+
+            const nextButton = document.getElementById('next-button');
+            nextButton.disabled = false;
+
+            const optionButtons = document.querySelectorAll('.option-button');
+            const rationaleArea = document.getElementById('rationale-area');
+            rationaleArea.classList.remove('hidden');
+
+            // Apply styling to options
+            optionButtons.forEach(button => {
+                const optionLetter = button.id.split('-')[1];
+                button.onclick = null; // Disable further clicks
+
+                if (optionLetter === currentQ.answer) {
+                    button.classList.remove('bg-gray-50', 'hover:bg-blue-50', 'hover:text-blue-700');
+                    button.classList.add('bg-green-100', 'text-green-800', 'border-2', 'border-green-500', 'font-semibold');
+                } else if (optionLetter === selectedLetter) {
+                    button.classList.remove('bg-gray-50', 'hover:bg-blue-50', 'hover:text-blue-700');
+                    button.classList.add('bg-red-100', 'text-red-800', 'border-2', 'border-red-500', 'font-semibold');
+                } else {
+                    button.classList.remove('hover:bg-blue-50', 'hover:text-blue-700');
+                    button.classList.add('bg-gray-50');
+                }
+            });
+
+            // Update score
+            if (selectedLetter === currentQ.answer) {
+                score++;
+            }
+            // Re-render to update the score display immediately
+            renderQuiz();
+        }
+
+        function navigateQuestion(direction) {
+            currentQuestionIndex += direction;
+            if (currentQuestionIndex < 0) currentQuestionIndex = 0;
+            if (currentQuestionIndex >= quizData.length) {
+                renderResults(document.getElementById('quiz-area'));
+            } else {
+                renderQuiz();
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function renderResults(quizArea) {
+            const percentage = ((score / quizData.length) * 100).toFixed(2);
+            let resultMessage = '';
+            let emoji = '';
+            let color = 'bg-red-100 border-red-500 text-red-700';
+
+            if (percentage >= 80) {
+                resultMessage = 'Xuất sắc! Bạn có kiến thức vững vàng về Tài chính.';
+                emoji = '🎉';
+                color = 'bg-green-100 border-green-500 text-green-700';
+            } else if (percentage >= 50) {
+                resultMessage = 'Tốt! Bạn đã nắm được phần lớn kiến thức, cần ôn tập thêm.';
+                emoji = '👍';
+                color = 'bg-yellow-100 border-yellow-500 text-yellow-700';
+            } else {
+                resultMessage = 'Cần cố gắng hơn! Hãy xem lại các câu trả lời sai và ôn tập kỹ hơn.';
+                emoji = '🤔';
+                color = 'bg-red-100 border-red-500 text-red-700';
+            }
+
+            const reviewHtml = quizData.map(q => {
+                const isCorrect = q.userAnswer === q.answer;
+                const icon = isCorrect ? '<i class="fas fa-check-circle text-green-500"></i>' : '<i class="fas fa-times-circle text-red-500"></i>';
+                const answerClass = isCorrect ? 'text-green-700' : 'text-red-700';
+                const userChoice = q.userAnswer ? `Bạn chọn: <span class="font-bold">${q.userAnswer}</span>` : 'Chưa trả lời';
+
+                return `
+                    <div class="p-4 border-b border-gray-100 last:border-b-0">
+                        <div class="flex items-start mb-2">
+                            <div class="mr-3 mt-1">${icon}</div>
+                            <p class="font-semibold text-gray-800">${q.id}. ${q.question}</p>
+                        </div>
+                        <p class="ml-7 text-sm ${answerClass}">${userChoice} | Đáp án đúng: <span class="font-bold">${q.answer}</span></p>
+                        <p class="ml-7 text-xs text-gray-600 mt-1">Giải thích: ${q.rationale}</p>
+                    </div>
+                `;
+            }).join('');
+
+            quizArea.innerHTML = `
+                <div class="text-center p-8">
+                    <div class="${color} p-6 rounded-2xl border-2 mb-6">
+                        <p class="text-6xl mb-4">${emoji}</p>
+                        <h2 class="text-3xl font-bold mb-2">Hoàn thành bài kiểm tra!</h2>
+                        <p class="text-xl font-semibold">Điểm của bạn: <span class="text-4xl">${score}</span>/${quizData.length}</p>
+                        <p class="text-lg">Tỷ lệ chính xác: <span class="font-bold">${percentage}%</span></p>
+                        <p class="mt-4 text-lg">${resultMessage}</p>
+                    </div>
+                    
+                    <button onclick="toggleReview()" id="toggle-review-button" class="mt-6 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-lg transition-all duration-300 transform hover:scale-105">
+                        <i class="fas fa-eye mr-2"></i> Xem lại các câu hỏi
+                    </button>
+                </div>
+
+                <div id="review-area" class="mt-8 pt-4 border-t border-gray-300 hidden">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Phần Xem Lại Chi Tiết</h3>
+                    ${reviewHtml}
+                </div>
+            `;
+            document.getElementById('reset-button').classList.remove('hidden');
+        }
+
+        function toggleReview() {
+            const reviewArea = document.getElementById('review-area');
+            const button = document.getElementById('toggle-review-button');
+            if (reviewArea.classList.contains('hidden')) {
+                reviewArea.classList.remove('hidden');
+                button.innerHTML = '<i class="fas fa-eye-slash mr-2"></i> Ẩn phần xem lại';
+            } else {
+                reviewArea.classList.add('hidden');
+                button.innerHTML = '<i class="fas fa-eye mr-2"></i> Xem lại các câu hỏi';
+            }
+        }
+
+        function resetQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            answeredQuestions = [];
+            isAnswered = false;
+            // Reset user answers in data
+            quizData.forEach(q => delete q.userAnswer);
+            document.getElementById('reset-button').classList.add('hidden');
+            renderQuiz();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Initialize quiz on window load
+        window.onload = function() {
+            renderQuiz();
+        };
+
+    </script>
+</body>
+</html>
